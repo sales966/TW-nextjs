@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
 // 高级渐入渐出的缓动曲线
-const ease = [0.22, 1, 0.36, 1];
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export function ScrollReveal({ 
   children, 
