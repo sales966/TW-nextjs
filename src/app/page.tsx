@@ -120,7 +120,7 @@ export default function Home() {
               <Link key={i} href="/products" className="group block text-left">
                 <RevealImage delay={i * 0.1}>
                   <div className="aspect-[4/5] bg-[#F6F4EF] mb-8 relative overflow-hidden flex items-center justify-center">
-                     <Image src={`/images/home/${['cat_luxury', 'cat_retail', 'cat_eco', 'cat_craft'][i]}.png`} fill alt={cat.t} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, 25vw" />
+                     <Image src={`/images/home/${['cat_luxury_v3', 'cat_retail', 'cat_eco', 'cat_craft'][i]}.png`} fill alt={cat.t} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, 25vw" />
                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 pointer-events-none z-20"></div>
                   </div>
                 </RevealImage>
