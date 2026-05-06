@@ -24,7 +24,7 @@ export default async function QuotesListPage() {
                </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-               {quotes.map((q) => (
+               {quotes.map((q: any) => (
                  <tr key={q.id} className="hover:bg-slate-50 transition">
                    <td className="p-4 font-mono font-medium text-slate-500 text-xs">{q.id.slice(-6)}</td>
                    <td className="p-4">

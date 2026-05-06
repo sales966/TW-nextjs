@@ -24,7 +24,7 @@ export default async function LeadsListPage() {
                </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-               {leads.map((lead) => (
+               {leads.map((lead: any) => (
                  <tr key={lead.id} className="hover:bg-slate-50 transition">
                    <td className="p-4">
                      <div className="font-semibold text-slate-900">{lead.contactName}</div>
