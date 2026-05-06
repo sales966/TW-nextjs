@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  CONVERTED
+  CLOSED
+}
+
+enum QuoteStatus {
+  PENDING
+  QUOTED
+  REJECTED
+}
+
+enum BoxType {
+  MAILER_BOX
+  SHIPPING_BOX
+  FOLDING_CARTON
+  RIGID_BOX
+}
+
+enum ProductStatus {
+  DRAFT
+  NEEDS_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BatchStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum FileRelationType {
+  QUOTE_ATTACHMENT
+  PRODUCT_IMAGE
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(MANAGER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Lead {
+  id           String   @id @default(uuid())
+  contactName  String
+  email        String   @unique
+  companyName  String?
+  country      String
+  phone        String?
+  whatsapp     String?
+  status       LeadStatus @default(NEW)
+  
+  quoteRequests QuoteRequest[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  name         String
+  slug         String   @unique
+  summary      String
+  description  String?
+  boxType      BoxType
+  featuredImage String?
+  moq          Int      @default(500)
+  isActive     Boolean  @default(true)
+  productCode  String?  @unique
+  attributes   Json     @default("{}")
+  aiTags       String[]
+  aiSummary    String?
+  media        Json     @default("[]")
+  status       ProductStatus @default(DRAFT)
+  
+  quoteRequests QuoteRequest[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime? 
+
+  @@index([deletedAt, isActive])
+  @@index([boxType])
+}
+
+model QuoteRequest {
+  id           String   @id @default(cuid())
+  leadId       String
+  productId    String?
+  
+  boxType      BoxType
+  length       Float
+  width        Float
+  height       Float
+  unit         String   @default("mm")
+  material     String
+  printing     String
+  finishes     Json?    
+  quantity     Int
+  notes        String?
+  
+  status       QuoteStatus @default(PENDING)
+  
+  lead         Lead      @relation(fields: [leadId], references: [id])
+  product      Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  files        UploadedFile[]
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([leadId])
+  @@index([status])
+}
+
+model UploadedFile {
+  id           String   @id @default(uuid())
+  fileName     String
+  fileUrl      String
+  fileSize     Int
+  fileType     String
+  
+  relatedType  FileRelationType
+  relatedId    String
+  
+  quote        QuoteRequest? @relation(fields: [relatedId], references: [id], map: "quote_file_fk")
+  
+  createdAt    DateTime @default(now())
+}
+
+model ImportBatch {
+  id           String      @id @default(cuid())
+  fileName     String      
+  totalCount   Int         @default(0) 
+  successCount Int         @default(0) 
+  status       BatchStatus @default(PENDING) 
+  errorLogs    Json?       
+  
+  createdAt    DateTime    @default(now())
+}
