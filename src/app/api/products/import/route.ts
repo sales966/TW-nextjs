@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Papa from "papaparse";
 import Fuse from "fuse.js";
+import { put } from "@vercel/blob";
 import fs from "fs/promises";
 import path from "path";
 
@@ -72,29 +73,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "请上传 CSV 表格或产品图片" }, { status: 400 });
     }
 
-    // 在 Vercel 云端环境中，由于硬盘是只读的，不能直接保存本地图片。
-    // 除非配置了云存储（如 AWS S3, Supabase Storage），否则需要拦截。
-    if (imageFiles.length > 0 && process.env.VERCEL) {
-      return NextResponse.json({ 
-        error: "当前处于 Vercel 云端生产环境，服务器硬盘为只读状态。请仅上传 CSV 数据表格进行导入。图片功能需后续接入云存储才能使用。" 
-      }, { status: 400 });
-    }
-
     // 4. 图片处理逻辑：存储并在内存中建立映射
     const imageMap: Record<string, string> = {};
     if (imageFiles.length > 0) {
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadDir, { recursive: true }); // 确保目录存在
+      const isCloud = process.env.VERCEL || process.env.BLOB_READ_WRITE_TOKEN;
+      
+      if (!isCloud) {
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+        await fs.mkdir(uploadDir, { recursive: true }); // 确保目录存在
+      }
       
       for (const img of imageFiles) {
         if (img.type.startsWith("image/")) {
-          const buffer = Buffer.from(await img.arrayBuffer());
           const fileName = `${Date.now()}-${img.name}`;
-          await fs.writeFile(path.join(uploadDir, fileName), buffer);
-          
-          const publicUrl = `/uploads/${fileName}`;
           const matchName = img.name.split('.')[0].toLowerCase();
-          imageMap[matchName] = publicUrl;
+          
+          if (isCloud) {
+            try {
+              // 必须开启 Vercel Blob 才能上传
+              const blob = await put(fileName, img, { access: 'public' });
+              imageMap[matchName] = blob.url;
+            } catch (err) {
+              return NextResponse.json({ 
+                error: "Vercel Blob 尚未配置！请到 Vercel 后台的 Storage 开启 Blob 功能，否则云端无法保存图片。" 
+              }, { status: 400 });
+            }
+          } else {
+            const buffer = Buffer.from(await img.arrayBuffer());
+            await fs.writeFile(path.join(process.cwd(), "public", "uploads", fileName), buffer);
+            imageMap[matchName] = `/uploads/${fileName}`;
+          }
         }
       }
     }
