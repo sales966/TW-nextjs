@@ -8,7 +8,6 @@ import { useI18n } from "@/lib/i18n";
 import { DawnBagsOpening } from "@/components/ui/dawn-bags-opening";
 import { AnimatePresence, motion } from "framer-motion";
 import { ScrollReveal, RevealText, RevealImage } from "@/components/ui/scroll-reveal";
-import { LuxuryPaperBagHeroVisual } from "@/components/home/LuxuryPaperBagHeroVisual";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -60,9 +59,9 @@ export default function Home() {
       ></div>
 
       {/* 1. Hero */}
-      <section className="relative pt-24 lg:pt-32 pb-0 overflow-visible">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-16 relative z-10">
-          <div className="flex-1 max-w-2xl pt-10 lg:sticky lg:top-40 self-start z-20">
+      <section className="relative pt-24 lg:pt-32 pb-40 overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16 relative z-10">
+          <div className="flex-1 max-w-2xl pt-10">
             <RevealText delay={0.1}>
               <div className="mb-14">
                  <span className="text-[12px] md:text-[13px] font-medium tracking-[0.2em] text-[#94A3B8] uppercase">
@@ -99,9 +98,12 @@ export default function Home() {
             </RevealText>
           </div>
           
-          <div className="flex-1 w-full relative -mt-20 lg:mt-0">
-            <LuxuryPaperBagHeroVisual />
-          </div>
+          <RevealImage delay={0.5} className="flex-1 w-full relative lg:h-[750px] h-[500px] flex items-center justify-end">
+            <div className="relative w-full h-full max-w-[650px] bg-[#FBFAF7] shadow-[0_40px_100px_rgba(16,24,40,0.06)]">
+              <Image src="/images/hero.png" alt="Premium Packaging Mockup" fill className="object-cover object-center" priority />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent mix-blend-multiply pointer-events-none"></div>
+            </div>
+          </RevealImage>
         </div>
       </section>
 
