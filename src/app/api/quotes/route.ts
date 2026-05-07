@@ -21,13 +21,11 @@ export async function POST(req: Request) {
       where: { email },
       update: {
         contactName,
-        companyName: company || null,
         phone: phone || null,
       },
       create: {
         email,
         contactName,
-        companyName: company || null,
         phone: phone || null,
         country: "Unknown", // Required by schema
       }
@@ -41,7 +39,7 @@ export async function POST(req: Request) {
         length: 0,
         width: 0,
         height: 0,
-        material: "待确认 (From Website Form)",
+        material: company || "未填写产品名称", // The "company" input is now used for Product Name
         printing: "待确认 (From Website Form)",
         quantity: qtyInt,
         notes: message || null,

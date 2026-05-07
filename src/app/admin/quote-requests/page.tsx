@@ -17,7 +17,7 @@ export default async function QuotesListPage() {
                <tr>
                  <th className="p-4">单号</th>
                  <th className="p-4">客户信息</th>
-                 <th className="p-4">产品类型</th>
+                 <th className="p-4">产品名称</th>
                  <th className="p-4">数量</th>
                  <th className="p-4">状态</th>
                  <th className="p-4 text-right">操作</th>
@@ -31,7 +31,7 @@ export default async function QuotesListPage() {
                      <div className="font-semibold text-slate-900">{q.lead?.companyName || q.lead?.contactName || '未知客户'}</div>
                      <div className="text-xs text-slate-500">{q.lead?.email}</div>
                    </td>
-                   <td className="p-4 text-slate-700">{q.boxType.replace('_', ' ')}</td>
+                   <td className="p-4 text-slate-700">{q.material}</td>
                    <td className="p-4 text-slate-700">{q.quantity}</td>
                    <td className="p-4">
                      <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${q.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-800'}`}>
