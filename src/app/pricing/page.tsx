@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Calculator, ArrowRight, Loader2, Info } from "lucide-react";
+import { Calculator, ArrowRight, Loader2, Info, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 
@@ -152,20 +152,18 @@ export default function PricingPage() {
                   <h3 className="text-[13px] font-bold text-[#101828] uppercase tracking-widest mb-4">
                     {t.matLabel}
                   </h3>
-                  <div className="flex flex-col gap-3">
-                    {materials.map(mat => (
-                      <button
-                        key={mat}
-                        onClick={() => setSelectedMaterial(mat)}
-                        className={`text-left px-5 py-4 rounded-xl text-[15px] font-medium transition-all duration-200 border ${
-                          selectedMaterial === mat 
-                            ? 'bg-[#101828] text-white border-[#101828] shadow-md' 
-                            : 'bg-white text-[#667085] border-[#101828]/10 hover:border-[#101828]/30 hover:bg-white'
-                        }`}
-                      >
-                        {mat}
-                      </button>
-                    ))}
+                  <div className="relative">
+                    <select
+                      value={selectedMaterial || ""}
+                      onChange={(e) => setSelectedMaterial(e.target.value)}
+                      className="w-full appearance-none px-5 py-4 rounded-xl border border-[#101828]/10 bg-white focus:border-[#101828] focus:ring-1 focus:ring-[#101828] outline-none font-medium text-[#101828] cursor-pointer transition-all shadow-sm"
+                    >
+                      <option value="" disabled>--- 请选择 ---</option>
+                      {materials.map(mat => (
+                        <option key={mat} value={mat}>{mat}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#667085] pointer-events-none" />
                   </div>
                 </div>
 
@@ -173,22 +171,24 @@ export default function PricingPage() {
                   <h3 className="text-[13px] font-bold text-[#101828] uppercase tracking-widest mb-4">
                     {t.sizeLabel}
                   </h3>
-                  <div className="flex flex-col gap-3">
-                    {availableSizes.length > 0 ? availableSizes.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`text-left px-5 py-4 rounded-xl text-[15px] font-medium transition-all duration-200 border ${
-                          selectedSize === size 
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
-                            : 'bg-white text-[#667085] border-[#101828]/10 hover:border-[#101828]/30 hover:bg-white'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    )) : (
+                  <div className="relative">
+                    {availableSizes.length > 0 ? (
+                      <>
+                        <select
+                          value={selectedSize || ""}
+                          onChange={(e) => setSelectedSize(e.target.value)}
+                          className="w-full appearance-none px-5 py-4 rounded-xl border border-[#101828]/10 bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none font-medium text-blue-700 cursor-pointer transition-all shadow-sm"
+                        >
+                          <option value="" disabled>--- 请选择 ---</option>
+                          {availableSizes.map(size => (
+                            <option key={size} value={size}>{size}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-600 pointer-events-none" />
+                      </>
+                    ) : (
                       <div className="text-sm text-[#667085] italic p-4 bg-white rounded-xl border border-[#101828]/5">
-                        No sizes configured for this material.
+                        No sizes configured for this product.
                       </div>
                     )}
                   </div>
