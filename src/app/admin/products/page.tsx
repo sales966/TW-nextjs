@@ -71,6 +71,7 @@ export default function AdminProductsPage() {
                           src={product.featuredImage.startsWith('http') ? product.featuredImage : `/uploads/${product.featuredImage.split('/').pop()}`} 
                           alt={product.name || "主图"} 
                           fill 
+                          unoptimized
                           className="object-cover cursor-zoom-in group-hover:scale-110 transition-transform duration-300" 
                           onClick={() => setSelectedImage(product.featuredImage.startsWith('http') ? product.featuredImage : `/uploads/${product.featuredImage.split('/').pop()}`)}
                         />
