@@ -9,9 +9,33 @@ export default function QuotePage() {
   const { t } = useI18n();
   const tq = t.quote;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      company: formData.get("company"),
+      quantity: formData.get("quantity"),
+      message: formData.get("message"),
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+    };
+
+    try {
+      const res = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        setIsSubmitted(true);
+      } else {
+        alert("提交失败，请重试 (Failed to submit)");
+      }
+    } catch (err) {
+      alert("网络错误 (Network error)");
+    }
   };
 
   if (isSubmitted) {
@@ -46,11 +70,11 @@ export default function QuotePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                    <div>
                      <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.comp}</label>
-                     <input required type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
+                     <input required name="company" type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
                    </div>
                    <div>
                      <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.qty}</label>
-                     <select className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors appearance-none">
+                     <select name="quantity" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors appearance-none">
                         <option>{tq.opt1}</option>
                         <option>{tq.opt2}</option>
                         <option>{tq.opt3}</option>
@@ -67,7 +91,7 @@ export default function QuotePage() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.msg}</label>
-                  <textarea rows={5} className="w-full bg-[#F6F4EF] rounded border border-[#101828]/10 p-6 font-medium focus:outline-none focus:border-[#101828] transition-colors resize-none placeholder:text-[#667085]/60" placeholder={tq.ph}></textarea>
+                  <textarea name="message" rows={5} className="w-full bg-[#F6F4EF] rounded border border-[#101828]/10 p-6 font-medium focus:outline-none focus:border-[#101828] transition-colors resize-none placeholder:text-[#667085]/60" placeholder={tq.ph}></textarea>
                 </div>
              </div>
 
@@ -79,21 +103,21 @@ export default function QuotePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div>
                     <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.fname}</label>
-                    <input required type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
+                    <input required name="firstName" type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.lname}</label>
-                    <input required type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
+                    <input required name="lastName" type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div>
                     <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.email}</label>
-                    <input required type="email" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
+                    <input required name="email" type="email" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.phone}</label>
-                    <input required type="tel" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
+                    <input required name="phone" type="tel" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
                   </div>
                 </div>
              </div>
