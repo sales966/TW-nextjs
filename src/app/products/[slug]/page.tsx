@@ -68,6 +68,7 @@ export default function ProductDetailPage() {
                     src={activeImage.startsWith('http') ? activeImage : `/uploads/${activeImage.split('/').pop()}`} 
                     alt={product.name} 
                     fill 
+                    unoptimized
                     className="object-cover" 
                  />
               ) : (
@@ -96,6 +97,7 @@ export default function ProductDetailPage() {
                           src={img.startsWith('http') ? img : `/uploads/${img.split('/').pop()}`} 
                           alt={`${product.name} 视图 ${i+1}`} 
                           fill 
+                          unoptimized
                           className="object-cover" 
                         />
                      </div>

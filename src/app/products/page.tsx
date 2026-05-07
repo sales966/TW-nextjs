@@ -116,7 +116,7 @@ export default function ProductsPage() {
               return (
               <Link href={`/products/${product.id}`} key={product.id} className="group block">
                 <div className="aspect-[4/5] bg-[#F6F4EF] mb-6 relative overflow-hidden flex flex-col justify-end p-8 border border-[#101828]/5 shadow-[0_4px_20px_rgba(16,24,40,0.02)]">
-                  <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={imageSrc} alt={product.name} fill unoptimized sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="relative z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">
                      <span className="bg-[#101828] text-white text-[12px] font-bold tracking-[0.15em] uppercase px-6 py-3">{tp.view}</span>
