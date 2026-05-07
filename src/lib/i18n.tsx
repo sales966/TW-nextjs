@@ -7,7 +7,7 @@ type Language = "en" | "zh" | "tw";
 const dictionaries = {
   en: {
     nav: {
-      home: "Home", products: "Products", types: "Types", materials: "Materials", sustainability: "Sustainability", about: "About", contact: "Contact", quote: "Request Quote",
+      home: "Home", products: "Products", pricing: "Pricing", types: "Types", materials: "Materials", sustainability: "Sustainability", about: "About", contact: "Contact", quote: "Request Quote",
     },
     megaMenu: {
       luxury: {
@@ -151,7 +151,7 @@ const dictionaries = {
   },
   zh: {
     nav: {
-      home: "首页", products: "产品服务", types: "包装类型", materials: "材质指引", sustainability: "可持续承诺", about: "关于我们", contact: "联系方式", quote: "获取报价",
+      home: "首页", products: "产品服务", pricing: "估价计算器", types: "包装类型", materials: "材质指引", sustainability: "可持续承诺", about: "关于我们", contact: "联系方式", quote: "获取报价",
     },
     megaMenu: {
       luxury: {
@@ -295,7 +295,7 @@ const dictionaries = {
   },
   tw: {
     nav: {
-      home: "首頁", products: "產品服務", types: "包裝類型", materials: "材質指引", sustainability: "永續承諾", about: "關於我們", contact: "聯絡方式", quote: "獲取報價",
+      home: "首頁", products: "產品服務", pricing: "估價計算器", types: "包裝類型", materials: "材質指引", sustainability: "永續承諾", about: "關於我們", contact: "聯絡方式", quote: "獲取報價",
     },
     megaMenu: {
       luxury: {

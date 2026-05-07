@@ -30,7 +30,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation - Advanced Tracking & Weight */}
           <nav className="hidden lg:flex items-center gap-10 h-full">
-            {["home", "products", "sustainability", "about", "contact"].map((key) => (
+            {["home", "products", "pricing", "sustainability", "about", "contact"].map((key) => (
               key === "products" ? (
                 <div key={key} className="group flex items-center h-full">
                   <Link href="/products" className="text-[14px] font-medium tracking-[0.02em] text-[#667085] group-hover:text-[#101828] transition-colors duration-300 py-6">
