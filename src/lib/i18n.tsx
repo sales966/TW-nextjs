@@ -32,11 +32,11 @@ const dictionaries = {
       }
     },
     home: {
-      heroTag: "Professional Custom Packaging",
-      heroT1: "Premium Custom", heroT2: "Paper Bag Solutions", heroT3: "For Modern Brands",
-      heroSubD1: "Luxury Bags", heroSubD2: "Retail Carriers", heroSubD3: "Eco-Friendly Kraft Bags",
-      heroDesc: "We provide professional custom paper packaging solutions, focusing on durability, aesthetics, and structural design to elevate your brand presence.",
-      heroBtn1: "Explore Products", heroBtn2: "Request a Quote",
+      heroTag: "Premium Custom Packaging",
+      heroT1: "Luxury Paper Bags,", heroT2: "Made for Premium", heroT3: "Brands.",
+      heroSubD1: "Black Card Paper", heroSubD2: "Gold Foil Stamping", heroSubD3: "Refined Finishing",
+      heroDesc: "Custom black card paper bags with gold foil stamping, refined finishing, and flexible production support from Taiwan and Shenzhen.",
+      heroBtn1: "View Paper Bag Options", heroBtn2: "Request a Quote",
       
       catTitle: "Our Shopping Bag Solutions",
       catSub: "From high-volume retail bags to premium boutique carriers, we offer comprehensive packaging support for various industries.",
@@ -176,11 +176,11 @@ const dictionaries = {
       }
     },
     home: {
-      heroTag: "专业定制纸袋制造商",
-      heroT1: "为现代品牌提供", heroT2: "高品质定制纸袋", heroT3: "包装解决方案",
-      heroSubD1: "精品礼袋", heroSubD2: "零售包装袋", heroSubD3: "环保牛皮纸袋",
-      heroDesc: "我们专注于提供专业、耐用且美观的定制纸袋服务。从材质选择、结构设计到印刷工艺，全力提升您的品牌形象。",
-      heroBtn1: "浏览产品系列", heroBtn2: "获取专属报价",
+      heroTag: "高端定制包装制造商",
+      heroT1: "专为高端品牌打造的", heroT2: "精品黑卡烫金纸袋", heroT3: "包装解决方案",
+      heroSubD1: "精品黑卡材质", heroSubD2: "高级烫金工艺", heroSubD3: "极致表面处理",
+      heroDesc: "提供定制化精品黑卡纸袋，搭配烫金与精致表面工艺，依托台湾与深圳两地资源，提供灵活且专业的量产支持。",
+      heroBtn1: "浏览精品纸袋系列", heroBtn2: "获取专属报价",
       
       catTitle: "我们的包装袋解决方案",
       catSub: "无论您需要大批量的日常零售包装，还是高端定制的品牌礼袋，我们都能为您提供完善的生产支持。",
@@ -320,11 +320,11 @@ const dictionaries = {
       }
     },
     home: {
-      heroTag: "專業客製紙袋製造商",
-      heroT1: "為現代品牌提供", heroT2: "高品質客製紙袋", heroT3: "包裝解決方案",
-      heroSubD1: "精品禮袋", heroSubD2: "零售包裝袋", heroSubD3: "環保牛皮紙袋",
-      heroDesc: "我們專注於提供專業、耐用且美觀的客製紙袋服務。從材質選擇、結構設計到印刷工藝，全力提升您的品牌形象。",
-      heroBtn1: "瀏覽產品系列", heroBtn2: "獲取專屬報價",
+      heroTag: "高端客製包裝製造商",
+      heroT1: "專為高端品牌打造的", heroT2: "精品黑卡燙金紙袋", heroT3: "包裝解決方案",
+      heroSubD1: "精品黑卡材質", heroSubD2: "高級燙金工藝", heroSubD3: "極致表面處理",
+      heroDesc: "提供客製化精品黑卡紙袋，搭配燙金與精緻表面工藝，依托台灣與深圳兩地資源，提供靈活且專業的量產支援。",
+      heroBtn1: "瀏覽精品紙袋系列", heroBtn2: "獲取專屬報價",
       
       catTitle: "我們的包裝袋解決方案",
       catSub: "無論您需要大批量的日常零售包裝，還是高端客製的品牌禮袋，我們都能為您提供完善的生產支援。",

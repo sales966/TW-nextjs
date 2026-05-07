@@ -7,6 +7,7 @@ import { ArrowRight, Plus } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { DawnBagsOpening } from "@/components/ui/dawn-bags-opening";
 import { AnimatePresence, motion } from "framer-motion";
+import { ScrollLuxuryPaperBagAnimation } from "@/components/home/ScrollLuxuryPaperBagAnimation";
 import { ScrollReveal, RevealText, RevealImage } from "@/components/ui/scroll-reveal";
 
 export default function Home() {
@@ -58,52 +59,53 @@ export default function Home() {
         style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\"/%3E%3C/svg%3E')" }}
       ></div>
 
-      {/* 1. Hero */}
-      <section className="relative pt-24 lg:pt-32 pb-40 overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16 relative z-10">
-          <div className="flex-1 max-w-2xl pt-10">
-            <RevealText delay={0.1}>
-              <div className="mb-14">
-                 <span className="text-[12px] md:text-[13px] font-medium tracking-[0.2em] text-[#94A3B8] uppercase">
-                   {th.heroTag}
-                 </span>
-              </div>
-            </RevealText>
-            <h1 className="flex flex-col mb-10">
-              <RevealText delay={0.2}><span className="text-[2.5rem] md:text-[3.5rem] font-light text-[#667085] tracking-tight leading-[1.1] mb-2 block">{th.heroT1}</span></RevealText>
-              <RevealText delay={0.3}><span className="text-[4.5rem] md:text-[5.5rem] font-black text-[#101828] tracking-tighter leading-[1.0] block">{th.heroT2}</span></RevealText>
-              <RevealText delay={0.4}><span className="text-[3rem] md:text-[4rem] font-semibold text-[#101828]/90 tracking-tight leading-[1.0] mt-1 block">{th.heroT3}</span></RevealText>
-            </h1>
-            <RevealText delay={0.5}>
-              <p className="text-[16px] md:text-[18px] text-[#101828] font-medium mb-12 tracking-wide flex items-center gap-3">
-                <span>{th.heroSubD1}</span><span className="text-[#94A3B8]">·</span>
-                <span>{th.heroSubD2}</span><span className="text-[#94A3B8]">·</span>
-                <span>{th.heroSubD3}</span>
-              </p>
-            </RevealText>
-            <RevealText delay={0.6}>
-              <p className="text-[16px] md:text-[17px] text-[#667085] font-normal mb-14 leading-[1.8] max-w-[480px]">
-                {th.heroDesc}
-              </p>
-            </RevealText>
-            <RevealText delay={0.7}>
-              <div className="flex flex-col sm:flex-row items-center gap-5">
-                <Link href="/products" className="w-full sm:w-auto px-10 py-5 bg-[#101828] text-white font-semibold tracking-[0.05em] uppercase text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_12px_40px_rgba(16,24,40,0.15)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_15px_50px_rgba(16,24,40,0.25)] text-center rounded-[4px]">
-                  {th.heroBtn1}
-                </Link>
-                <Link href="/quote" className="w-full sm:w-auto px-10 py-5 bg-transparent border-[1.5px] border-[#101828]/10 hover:border-[#101828] text-[#101828] font-semibold tracking-[0.05em] uppercase text-[14px] transition-all duration-500 hover:-translate-y-1 hover:bg-[#101828] hover:text-white text-center rounded-[4px]">
-                  {th.heroBtn2}
-                </Link>
-              </div>
-            </RevealText>
-          </div>
-          
-          <RevealImage delay={0.5} className="flex-1 w-full relative lg:h-[750px] h-[500px] flex items-center justify-end">
-            <div className="relative w-full h-full max-w-[650px] bg-[#FBFAF7] shadow-[0_40px_100px_rgba(16,24,40,0.06)]">
-              <Image src="/images/hero.png" alt="Premium Packaging Mockup" fill className="object-cover object-center" priority />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent mix-blend-multiply pointer-events-none"></div>
+      {/* 1. Hero with Scroll Animation */}
+      <section className="relative h-[250vh] lg:h-[300vh] bg-[#FAF8F5]">
+        <ScrollLuxuryPaperBagAnimation />
+        
+        <div className="sticky top-0 h-screen w-full flex items-center z-10 pointer-events-none">
+          <div className="max-w-[1400px] w-full mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16">
+            
+            <div className="flex-1 max-w-2xl pt-24 pointer-events-auto">
+              <RevealText delay={0.1}>
+                <div className="mb-14">
+                   <span className="text-[12px] md:text-[13px] font-bold tracking-[0.2em] text-[#D4AF37] uppercase bg-[#D4AF37]/10 px-4 py-2 rounded-full border border-[#D4AF37]/20">
+                     {th.heroTag}
+                   </span>
+                </div>
+              </RevealText>
+              <h1 className="flex flex-col mb-10">
+                <RevealText delay={0.2}><span className="text-[2.5rem] md:text-[3.5rem] font-light text-[#667085] tracking-tight leading-[1.1] mb-2 block">{th.heroT1}</span></RevealText>
+                <RevealText delay={0.3}><span className="text-[4rem] md:text-[5.5rem] font-black text-[#101828] tracking-tighter leading-[1.0] block">{th.heroT2}</span></RevealText>
+                <RevealText delay={0.4}><span className="text-[3rem] md:text-[4rem] font-serif text-[#101828]/90 tracking-tight leading-[1.0] mt-2 block italic">{th.heroT3}</span></RevealText>
+              </h1>
+              <RevealText delay={0.5}>
+                <p className="text-[14px] md:text-[16px] text-[#101828] font-bold mb-10 tracking-[0.1em] flex items-center gap-3 uppercase">
+                  <span className="text-[#D4AF37]">{th.heroSubD1}</span><span className="text-[#D4AF37]/40">|</span>
+                  <span className="text-[#D4AF37]">{th.heroSubD2}</span><span className="text-[#D4AF37]/40">|</span>
+                  <span className="text-[#D4AF37]">{th.heroSubD3}</span>
+                </p>
+              </RevealText>
+              <RevealText delay={0.6}>
+                <p className="text-[16px] md:text-[17px] text-[#667085] font-normal mb-14 leading-[1.8] max-w-[480px]">
+                  {th.heroDesc}
+                </p>
+              </RevealText>
+              <RevealText delay={0.7}>
+                <div className="flex flex-col sm:flex-row items-center gap-5">
+                  <Link href="/products" className="w-full sm:w-auto px-10 py-5 bg-[#101828] text-[#D4AF37] font-semibold tracking-[0.05em] uppercase text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_12px_40px_rgba(16,24,40,0.15)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_15px_50px_rgba(16,24,40,0.25)] text-center rounded-[4px] border border-[#101828]">
+                    {th.heroBtn1}
+                  </Link>
+                  <Link href="/quote" className="w-full sm:w-auto px-10 py-5 bg-transparent border-[1.5px] border-[#101828]/20 hover:border-[#101828] text-[#101828] font-semibold tracking-[0.05em] uppercase text-[14px] transition-all duration-500 hover:-translate-y-1 hover:bg-[#101828] hover:text-white text-center rounded-[4px]">
+                    {th.heroBtn2}
+                  </Link>
+                </div>
+              </RevealText>
             </div>
-          </RevealImage>
+            
+            {/* Placeholder to balance the layout against the fixed animation */}
+            <div className="flex-1 hidden lg:block"></div>
+          </div>
         </div>
       </section>
 
