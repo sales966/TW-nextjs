@@ -53,7 +53,7 @@ export default function Footer() {
               <li><Link href="/resources/sizes" className="hover:text-white transition-colors">{tf.r1}</Link></li>
               <li><Link href="/resources/materials" className="hover:text-white transition-colors">{tf.r2}</Link></li>
               <li><Link href="/resources/handles" className="hover:text-white transition-colors">{tf.r3}</Link></li>
-              <li><Link href="/resources/eco-report" className="hover:text-white transition-colors">{tf.r4}</Link></li>
+              <li><Link href="/sustainability" className="hover:text-white transition-colors">{tf.r4}</Link></li>
             </ul>
           </div>
 
