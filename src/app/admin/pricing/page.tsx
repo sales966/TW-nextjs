@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2, Search } from "lucide-react";
 
 export default function PricingRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -15,6 +15,7 @@ export default function PricingRulesPage() {
 
   // 后台看板查看状态
   const [viewProduct, setViewProduct] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [tiers, setTiers] = useState([
     { quantity: "500", unitPrice: "" },
@@ -88,6 +89,7 @@ export default function PricingRulesPage() {
 
   // 提取唯一的商品名 (用于看板左侧)
   const uniqueProducts = Array.from(new Set(rules.map((r: any) => r.material)));
+  const filteredProducts = uniqueProducts.filter((p: any) => p.toLowerCase().includes(searchTerm.toLowerCase()));
 
   // 默认选中第一个商品
   useEffect(() => {
@@ -261,10 +263,22 @@ export default function PricingRulesPage() {
           ) : (
             <div className="flex flex-col md:flex-row min-h-[500px]">
               {/* 左侧：商品导航树 */}
-              <div className="md:w-1/3 lg:w-1/4 border-r border-slate-100 bg-slate-50/30 p-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">选择商品名</h3>
-                <div className="flex flex-col gap-1">
-                  {uniqueProducts.map((product: any) => (
+              <div className="md:w-1/3 lg:w-1/4 border-r border-slate-100 bg-slate-50/30 p-4 flex flex-col">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">选择商品名</h3>
+                
+                <div className="relative mb-4 px-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input 
+                    type="text" 
+                    placeholder="搜索商品..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 overflow-y-auto max-h-[600px] px-1 pb-4">
+                  {filteredProducts.length > 0 ? filteredProducts.map((product: any) => (
                     <button
                       key={product}
                       onClick={() => setViewProduct(product)}
@@ -276,7 +290,9 @@ export default function PricingRulesPage() {
                     >
                       {product}
                     </button>
-                  ))}
+                  )) : (
+                    <div className="text-sm text-slate-400 text-center py-4">未找到匹配商品</div>
+                  )}
                 </div>
               </div>
 
