@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2, Search } from "lucide-react";
+import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2, Search, Edit2, Save } from "lucide-react";
 
 export default function PricingRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -16,6 +16,10 @@ export default function PricingRulesPage() {
   // 后台看板查看状态
   const [viewProduct, setViewProduct] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // 编辑状态
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPrice, setEditPrice] = useState<string>("");
 
   const [tiers, setTiers] = useState([
     { quantity: "500", unitPrice: "" },
@@ -81,6 +85,27 @@ export default function PricingRulesPage() {
         fetchRules();
       } else {
         alert("删除失败");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSaveEdit = async (rule: any) => {
+    if (!editPrice) return;
+    try {
+      const res = await fetch(`/api/admin/pricing/${rule.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unitPrice: editPrice, quantity: rule.quantity }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingId(null);
+        setEditPrice("");
+        fetchRules();
+      } else {
+        alert("修改失败");
       }
     } catch (error) {
       console.error(error);
@@ -334,19 +359,64 @@ export default function PricingRulesPage() {
                                   {rule.quantity.toLocaleString()} 个
                                 </div>
                                 <div className="text-right font-bold text-blue-600 text-sm">
-                                  ${rule.unitPrice.toFixed(3)}
+                                  {editingId === rule.id ? (
+                                    <input
+                                      type="number"
+                                      step="0.001"
+                                      autoFocus
+                                      value={editPrice}
+                                      onChange={(e) => setEditPrice(e.target.value)}
+                                      className="w-20 px-2 py-1 text-right border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+                                  ) : (
+                                    `$${rule.unitPrice.toFixed(3)}`
+                                  )}
                                 </div>
                                 <div className="text-right font-medium text-slate-700 text-sm">
-                                  ${rule.totalPrice.toFixed(2)}
+                                  {editingId === rule.id ? (
+                                    <span className="text-slate-400">自动计算</span>
+                                  ) : (
+                                    `$${rule.totalPrice.toFixed(2)}`
+                                  )}
                                 </div>
                                 <div className="text-center">
-                                  <button
-                                    onClick={() => handleDelete(rule.id)}
-                                    className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover/row:opacity-100 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
-                                    title="删除此阶梯"
-                                  >
-                                    <Trash2 className="w-4 h-4 mx-auto" />
-                                  </button>
+                                  {editingId === rule.id ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button
+                                        onClick={() => handleSaveEdit(rule)}
+                                        className="text-green-500 hover:text-green-600 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
+                                        title="保存"
+                                      >
+                                        <Save className="w-4 h-4 mx-auto" />
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingId(null)}
+                                        className="text-slate-400 hover:text-slate-600 text-xs px-2"
+                                      >
+                                        取消
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-center gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                                      <button
+                                        onClick={() => {
+                                          setEditingId(rule.id);
+                                          setEditPrice(rule.unitPrice.toString());
+                                        }}
+                                        className="text-slate-400 hover:text-blue-500 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
+                                        title="编辑此阶梯"
+                                      >
+                                        <Edit2 className="w-4 h-4 mx-auto" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDelete(rule.id)}
+                                        className="text-slate-400 hover:text-red-500 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
+                                        title="删除此阶梯"
+                                      >
+                                        <Trash2 className="w-4 h-4 mx-auto" />
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             ))}
