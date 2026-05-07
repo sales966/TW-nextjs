@@ -160,3 +160,18 @@ model ImportBatch {
   
   createdAt    DateTime    @default(now())
 }
+
+model PricingRule {
+  id          String   @id @default(cuid())
+  material    String   // e.g. "牛皮单色250克"
+  size        String   // e.g. "12.8cm*9.5cm*22cm"
+  quantity    Int      // e.g. 500
+  unitPrice   Float    // e.g. 0.50
+  totalPrice  Float    // e.g. 250.00
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([material, size, quantity])
+  @@index([material])
+}

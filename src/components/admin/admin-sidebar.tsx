@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, FileText, PackageSearch, LogOut, Box, UserCog } from "lucide-react";
+import { LayoutDashboard, Users, FileText, PackageSearch, LogOut, Box, UserCog, Calculator } from "lucide-react";
 
 export default function AdminSidebar({ className, userRole = 'MANAGER' }: { className?: string, userRole?: string }) {
   const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function AdminSidebar({ className, userRole = 'MANAGER' }: { clas
     { label: "数据总览", href: "/admin", icon: LayoutDashboard },
     { label: "客户线索", href: "/admin/leads", icon: Users },
     { label: "报价引擎", href: "/admin/quote-requests", icon: FileText },
+    { label: "报价资料库", href: "/admin/pricing", icon: Calculator },
     { label: "产品配置", href: "/admin/products", icon: PackageSearch },
   ];
 
