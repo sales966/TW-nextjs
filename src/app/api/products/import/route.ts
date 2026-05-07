@@ -64,47 +64,14 @@ export async function POST(req: Request) {
     const url = new URL(req.url);
     const isPreview = url.searchParams.get("preview") === "true"; // 支持 preview 模式
     
-    // 解析 FormData (CSV + JPG)
+    // 解析 FormData (CSV + imageMap)
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const imageFiles = formData.getAll("images") as File[];
+    const imageMapStr = formData.get("imageMap") as string;
+    const imageMap: Record<string, string> = imageMapStr ? JSON.parse(imageMapStr) : {};
     
-    if (!file && imageFiles.length === 0) {
+    if (!file && Object.keys(imageMap).length === 0) {
       return NextResponse.json({ error: "请上传 CSV 表格或产品图片" }, { status: 400 });
-    }
-
-    // 4. 图片处理逻辑：存储并在内存中建立映射
-    const imageMap: Record<string, string> = {};
-    if (imageFiles.length > 0) {
-      const isCloud = process.env.VERCEL || process.env.BLOB_READ_WRITE_TOKEN;
-      
-      if (!isCloud) {
-        const uploadDir = path.join(process.cwd(), "public", "uploads");
-        await fs.mkdir(uploadDir, { recursive: true }); // 确保目录存在
-      }
-      
-      for (const img of imageFiles) {
-        if (img.type.startsWith("image/")) {
-          const fileName = `${Date.now()}-${img.name}`;
-          const matchName = img.name.split('.')[0].toLowerCase();
-          
-          if (isCloud) {
-            try {
-              // 必须开启 Vercel Blob 才能上传
-              const blob = await put(fileName, img, { access: 'public' });
-              imageMap[matchName] = blob.url;
-            } catch (err) {
-              return NextResponse.json({ 
-                error: "Vercel Blob 尚未配置！请到 Vercel 后台的 Storage 开启 Blob 功能，否则云端无法保存图片。" 
-              }, { status: 400 });
-            }
-          } else {
-            const buffer = Buffer.from(await img.arrayBuffer());
-            await fs.writeFile(path.join(process.cwd(), "public", "uploads", fileName), buffer);
-            imageMap[matchName] = `/uploads/${fileName}`;
-          }
-        }
-      }
     }
 
     const parsedProducts = [];
@@ -168,23 +135,18 @@ export async function POST(req: Request) {
     } else {
       // 纯图片导入模式：直接使用图片名作为产品名
       let i = 0;
-      for (const img of imageFiles) {
-        if (img.type.startsWith("image/")) {
-          const originalName = img.name.split('.')[0];
-          const searchKeyName = originalName.toLowerCase();
-          
-          parsedProducts.push({
-            name: originalName,
-            code: `SKU-${Date.now().toString().slice(-6)}-${i++}`,
-            category: "General Packaging",
-            dimensions: { width: 0, height: 0, depth: 0 },
-            material: "Standard Paper",
-            printing: "CMYK",
-            moq: 500,
-            image: imageMap[searchKeyName],
-            attributes: {}
-          });
-        }
+      for (const [key, url] of Object.entries(imageMap)) {
+        parsedProducts.push({
+          name: key,
+          code: `SKU-${Date.now().toString().slice(-6)}-${i++}`,
+          category: "General Packaging",
+          dimensions: { width: 0, height: 0, depth: 0 },
+          material: "Standard Paper",
+          printing: "CMYK",
+          moq: 500,
+          image: url,
+          attributes: {}
+        });
       }
     }
 

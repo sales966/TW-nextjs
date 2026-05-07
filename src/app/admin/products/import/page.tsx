@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { UploadCloud, FileType, CheckCircle2 } from "lucide-react";
+import { UploadCloud, FileType, CheckCircle2, Loader2 } from "lucide-react";
+import { upload } from "@vercel/blob/client";
 
 export default function SimpleImportPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -17,12 +18,31 @@ export default function SimpleImportPage() {
       alert("请至少上传一个 CSV 数据表或产品图片");
       return;
     }
-    
     setIsUploading(true);
     try {
+      // 1. 直接在客户端将图片上传到 Vercel Blob（突破 4.5MB 限制）
+      const imageMap: Record<string, string> = {};
+      if (images.length > 0) {
+        // 并发上传所有图片
+        const uploadPromises = images.map(async (img) => {
+          const fileName = `${Date.now()}-${img.name}`;
+          const matchName = img.name.split('.')[0].toLowerCase();
+          
+          const newBlob = await upload(fileName, img, {
+            access: 'public',
+            handleUploadUrl: '/api/upload',
+          });
+          
+          imageMap[matchName] = newBlob.url;
+        });
+        
+        await Promise.all(uploadPromises);
+      }
+
+      // 2. 将 CSV 文件和 图片映射关系 一起发送给后端
       const formData = new FormData();
       if (file) formData.append("file", file);
-      images.forEach((img) => formData.append("images", img));
+      formData.append("imageMap", JSON.stringify(imageMap));
 
       const res = await fetch("/api/products/import", {
         method: "POST",
@@ -114,7 +134,10 @@ export default function SimpleImportPage() {
             className="w-full bg-slate-900 text-white rounded-xl py-4 text-lg font-semibold hover:bg-slate-800 disabled:opacity-50 transition-all flex justify-center items-center shadow-lg"
           >
             {isUploading ? (
-              <span className="animate-pulse flex items-center gap-2">后端自动解析与清洗中...</span>
+              <span className="animate-pulse flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                正在直传云端并解析数据，请耐心等待...
+              </span>
             ) : (
               "一键全自动导入"
             )}

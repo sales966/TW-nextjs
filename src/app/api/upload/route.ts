@@ -1,32 +1,34 @@
-import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
+import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody;
+
   try {
-    const formData = await req.formData();
-    const files = formData.getAll("file") as File[];
-    
-    if (!files || files.length === 0) {
-      return NextResponse.json({ error: "No files provided" }, { status: 400 });
-    }
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname) => {
+        // 生产环境中应该验证用户的登录状态 session
+        // 这里为了演示直接允许
+        return {
+          allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+          tokenPayload: JSON.stringify({
+            // 可选的 token payload
+          }),
+        };
+      },
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        // 上传完成后的回调
+        console.log('Blob upload completed', blob, tokenPayload);
+      },
+    });
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-    
-    const urls: string[] = [];
-    for (const file of files) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      // 去除非法字符防止路径注入
-      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-      const fileName = `${Date.now()}-${safeName}`;
-      await fs.writeFile(path.join(uploadDir, fileName), buffer);
-      urls.push(`/uploads/${fileName}`);
-    }
-
-    return NextResponse.json({ success: true, urls });
+    return NextResponse.json(jsonResponse);
   } catch (error) {
-    console.error("Upload error:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 400 }, // The webhook will retry 5 times waiting for a 200
+    );
   }
 }
