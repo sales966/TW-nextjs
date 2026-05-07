@@ -28,16 +28,25 @@ export default function SimpleImportPage() {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+      
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        alert(`请求失败 (状态码: ${res.status}): 服务器返回了非标准数据。可能是上传的图片总体积太大了（Vercel 限制单次上传不超过 4.5MB）。\n返回内容片段: ${text.slice(0, 100)}...`);
+        setIsUploading(false);
+        return;
+      }
       
       if (res.ok && data.success) {
         setResult(data);
       } else {
         alert(`导入失败: ${data.error || "未知错误"}`);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("导入过程发生网络异常。");
+      alert(`导入过程发生彻底断连，可能是网络超时或图片过大: ${e.message}`);
     } finally {
       setIsUploading(false);
     }
