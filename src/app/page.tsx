@@ -8,7 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { DawnBagsOpening } from "@/components/ui/dawn-bags-opening";
 import { AnimatePresence, motion } from "framer-motion";
 import { ScrollReveal, RevealText, RevealImage } from "@/components/ui/scroll-reveal";
-import { ScrollLuxuryPaperBagAnimation } from "@/components/home/ScrollLuxuryPaperBagAnimation";
+import { LuxuryPaperBagHeroVisual } from "@/components/home/LuxuryPaperBagHeroVisual";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -100,7 +100,7 @@ export default function Home() {
           </div>
           
           <div className="flex-1 w-full relative -mt-20 lg:mt-0">
-            <ScrollLuxuryPaperBagAnimation />
+            <LuxuryPaperBagHeroVisual />
           </div>
         </div>
       </section>
