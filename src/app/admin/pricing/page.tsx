@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Calculator, Loader2 } from "lucide-react";
+import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2 } from "lucide-react";
 
 export default function PricingRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -11,9 +11,13 @@ export default function PricingRulesPage() {
   const [formData, setFormData] = useState({
     material: "牛皮单色250克",
     size: "12.8cm*9.5cm*22cm",
-    quantity: "500",
-    unitPrice: "",
   });
+
+  const [tiers, setTiers] = useState([
+    { quantity: "500", unitPrice: "" },
+    { quantity: "2000", unitPrice: "" },
+    { quantity: "5000", unitPrice: "" }
+  ]);
 
   const fetchRules = async () => {
     try {
@@ -35,19 +39,24 @@ export default function PricingRulesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.unitPrice) return alert("请输入单价");
+    const validTiers = tiers.filter(t => t.quantity && t.unitPrice);
+    if (validTiers.length === 0) return alert("请至少填写一个完整的价格阶梯");
     
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/admin/pricing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          material: formData.material,
+          size: formData.size,
+          tiers: validTiers
+        }),
       });
       const data = await res.json();
       if (data.success) {
-        alert("添加成功！");
-        setFormData(prev => ({ ...prev, unitPrice: "" }));
+        // 重置单价输入，但保留数量阶梯方便下次录入
+        setTiers(tiers.map(t => ({ ...t, unitPrice: "" })));
         fetchRules();
       } else {
         alert(data.error || "添加失败");
@@ -60,7 +69,7 @@ export default function PricingRulesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("确定要删除这条报价规则吗？")) return;
+    if (!confirm("确定要删除这条报价吗？")) return;
     try {
       const res = await fetch(`/api/admin/pricing/${id}`, { method: "DELETE" });
       const data = await res.json();
@@ -74,168 +83,224 @@ export default function PricingRulesPage() {
     }
   };
 
+  // 按照 材质+尺寸 分组数据
+  const groupedRules = rules.reduce((acc: any, rule: any) => {
+    const key = `${rule.material}|${rule.size}`;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(rule);
+    return acc;
+  }, {});
+
   return (
-    <div className="p-10 max-w-7xl mx-auto">
-      <div className="flex items-center mb-8">
-        <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mr-5">
-          <Calculator className="w-6 h-6 text-blue-600" />
+    <div className="min-h-screen bg-[#fafafa] p-8 lg:p-12 font-sans">
+      <div className="max-w-[1200px] mx-auto">
+        
+        {/* 头部标题区 */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+          <div className="flex items-center">
+            <div className="w-14 h-14 bg-[#101828] rounded-2xl flex items-center justify-center mr-6 shadow-xl shadow-slate-200">
+              <Calculator className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-[#101828] tracking-tight">阶梯报价库 (Price Matrix)</h1>
+              <p className="text-slate-500 mt-2 font-medium">批量录入不同规格的批发价格，自动同步至客户前台估价计算器。</p>
+            </div>
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">阶梯报价库</h1>
-          <p className="text-slate-500 mt-1">在这里配置你们的标准品价格矩阵，前台客户可以通过计算器查看粗略报价。</p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* 左侧：添加表单 */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
+        {/* 批量录入工作台 */}
+        <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm mb-12">
           <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
-            <Plus className="w-5 h-5 mr-2 text-blue-600" /> 新增阶梯价格
+            <Layers className="w-5 h-5 mr-2 text-blue-600" /> 批量添加价格阶梯
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">材质与规格</label>
-              <input
-                type="text"
-                list="material-options"
-                required
-                value={formData.material}
-                onChange={(e) => setFormData({ ...formData, material: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
-                placeholder="例如：牛皮单色250克"
-              />
-              <datalist id="material-options">
-                <option value="牛皮单色250克" />
-                <option value="铜版纸4色250克" />
-                <option value="黑卡单色250克" />
-                <option value="普通纸单印120克" />
-              </datalist>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">长宽高尺寸</label>
-              <input
-                type="text"
-                list="size-options"
-                required
-                value={formData.size}
-                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
-                placeholder="例如：12.8cm*9.5cm*22cm"
-              />
-              <datalist id="size-options">
-                <option value="12.8cm*9.5cm*22cm" />
-                <option value="21cm*14cm*19cm" />
-                <option value="28cm*15cm*28cm" />
-              </datalist>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">起订量 (个)</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">选择材质与工艺</label>
                 <input
-                  type="number"
-                  list="qty-options"
+                  type="text"
+                  list="material-options"
                   required
-                  min="1"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
-                  placeholder="例如：500"
+                  value={formData.material}
+                  onChange={(e) => setFormData({ ...formData, material: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-medium text-slate-900 transition-all"
                 />
-                <datalist id="qty-options">
-                  <option value="500" />
-                  <option value="2000" />
-                  <option value="5000" />
-                  <option value="10000" />
-                  <option value="20000" />
-                  <option value="30000" />
+                <datalist id="material-options">
+                  <option value="牛皮单色250克" />
+                  <option value="铜版纸4色250克" />
+                  <option value="黑卡单色250克" />
+                  <option value="普通纸单印120克" />
                 </datalist>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">单价 ($)</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">选择尺寸 (长宽高)</label>
                 <input
-                  type="number"
-                  step="0.001"
+                  type="text"
+                  list="size-options"
                   required
-                  value={formData.unitPrice}
-                  onChange={(e) => setFormData({ ...formData, unitPrice: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
-                  placeholder="例如：0.85"
+                  value={formData.size}
+                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-medium text-slate-900 transition-all"
                 />
+                <datalist id="size-options">
+                  <option value="12.8cm*9.5cm*22cm" />
+                  <option value="21cm*14cm*19cm" />
+                  <option value="28cm*15cm*28cm" />
+                </datalist>
               </div>
             </div>
 
-            <div className="pt-2">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-sm font-bold text-slate-700">配置数量与单价</label>
+                <button
+                  type="button"
+                  onClick={() => setTiers([...tiers, { quantity: "", unitPrice: "" }])}
+                  className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 px-3 py-1.5 rounded-lg"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> 增加一个阶梯
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {tiers.map((tier, idx) => (
+                  <div key={idx} className="flex items-center gap-4">
+                    <div className="flex-1 relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">起订量</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={tier.quantity}
+                        onChange={(e) => {
+                          const newTiers = [...tiers];
+                          newTiers[idx].quantity = e.target.value;
+                          setTiers(newTiers);
+                        }}
+                        className="w-full pl-16 pr-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-bold text-slate-900 transition-all"
+                        placeholder="如：500"
+                      />
+                    </div>
+                    <div className="flex-1 relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">单价 $</span>
+                      <input
+                        type="number"
+                        step="0.001"
+                        value={tier.unitPrice}
+                        onChange={(e) => {
+                          const newTiers = [...tiers];
+                          newTiers[idx].unitPrice = e.target.value;
+                          setTiers(newTiers);
+                        }}
+                        className="w-full pl-16 pr-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-blue-600 outline-none font-bold text-blue-600 transition-all"
+                        placeholder="如：0.85"
+                      />
+                    </div>
+                    {tiers.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setTiers(tiers.filter((_, i) => i !== idx))}
+                        className="p-3 text-slate-400 hover:text-red-500 bg-white border border-slate-200 rounded-xl hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-4 flex justify-end">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center shadow-sm disabled:opacity-50"
+                className="bg-[#101828] hover:bg-black text-white font-bold py-3.5 px-8 rounded-xl transition-colors flex items-center justify-center shadow-lg disabled:opacity-50"
               >
-                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "保存报价规则"}
+                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <CheckCircle2 className="w-5 h-5 mr-2" />}
+                {isSubmitting ? "正在保存..." : "一键保存这批阶梯价"}
               </button>
             </div>
           </form>
         </div>
 
-        {/* 右侧：数据表格 */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            {isLoading ? (
-              <div className="p-12 flex justify-center"><Loader2 className="w-8 h-8 text-blue-600 animate-spin" /></div>
-            ) : rules.length === 0 ? (
-              <div className="p-16 text-center text-slate-500">
-                <Calculator className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-                <p>目前还没有录入任何报价数据</p>
-                <p className="text-sm mt-2">请在左侧表单中添加</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-600">
-                  <thead className="bg-slate-50 text-slate-500 text-xs uppercase border-b border-slate-200">
-                    <tr>
-                      <th className="px-6 py-4 font-bold">材质规格</th>
-                      <th className="px-6 py-4 font-bold">尺寸</th>
-                      <th className="px-6 py-4 font-bold text-right">数量阶梯</th>
-                      <th className="px-6 py-4 font-bold text-right">单价</th>
-                      <th className="px-6 py-4 font-bold text-right">总价</th>
-                      <th className="px-6 py-4 font-bold text-center">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {rules.map((rule) => (
-                      <tr key={rule.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-slate-900">{rule.material}</td>
-                        <td className="px-6 py-4">{rule.size}</td>
-                        <td className="px-6 py-4 text-right">
-                          <span className="bg-slate-100 px-2 py-1 rounded-md font-medium text-slate-700">
-                            {rule.quantity.toLocaleString()} 个
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right font-bold text-blue-600">
-                          ${rule.unitPrice.toFixed(3)}
-                        </td>
-                        <td className="px-6 py-4 text-right font-medium">
-                          ${rule.totalPrice.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => handleDelete(rule.id)}
-                            className="text-slate-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
-                            title="删除"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+        {/* 沉浸式数据看板 */}
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+            <h2 className="text-lg font-bold text-slate-800 flex items-center">
+              <Box className="w-5 h-5 mr-2 text-slate-500" /> 已上架报价总览
+            </h2>
           </div>
+          
+          {isLoading ? (
+            <div className="p-20 flex justify-center"><Loader2 className="w-8 h-8 text-[#101828] animate-spin" /></div>
+          ) : Object.keys(groupedRules).length === 0 ? (
+            <div className="p-24 text-center text-slate-500">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Box className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-lg font-medium text-slate-900 mb-1">暂无报价数据</p>
+              <p className="text-sm">请使用上方的工作台批量录入</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {Object.entries(groupedRules).map(([key, group]: [string, any]) => {
+                const [material, size] = key.split('|');
+                return (
+                  <div key={key} className="flex flex-col lg:flex-row hover:bg-slate-50/30 transition-colors">
+                    {/* 左侧大类信息 */}
+                    <div className="lg:w-1/3 p-6 lg:p-8 bg-slate-50/50 lg:bg-transparent border-b lg:border-b-0 lg:border-r border-slate-100">
+                      <div className="inline-block px-3 py-1 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider rounded-md mb-3">
+                        产品组合
+                      </div>
+                      <h3 className="text-lg font-black text-slate-900 mb-1">{material}</h3>
+                      <p className="text-slate-500 font-medium text-sm flex items-center">
+                        <span className="w-2 h-2 rounded-full bg-slate-300 mr-2"></span>
+                        {size}
+                      </p>
+                    </div>
+                    
+                    {/* 右侧阶梯明细 */}
+                    <div className="lg:w-2/3 p-6 lg:p-8">
+                      <div className="grid grid-cols-4 text-xs font-bold text-slate-400 uppercase tracking-wider pb-3 border-b border-slate-100 mb-3">
+                        <div>订购数量</div>
+                        <div className="text-right">预估单价</div>
+                        <div className="text-right">预估总价</div>
+                        <div className="text-center">操作</div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {group.map((rule: any) => (
+                          <div key={rule.id} className="grid grid-cols-4 items-center py-2 px-3 -mx-3 rounded-lg hover:bg-slate-100 transition-colors group/row">
+                            <div className="font-bold text-slate-900 text-sm">
+                              {rule.quantity.toLocaleString()} 个
+                            </div>
+                            <div className="text-right font-bold text-blue-600 text-sm">
+                              ${rule.unitPrice.toFixed(3)}
+                            </div>
+                            <div className="text-right font-medium text-slate-700 text-sm">
+                              ${rule.totalPrice.toFixed(2)}
+                            </div>
+                            <div className="text-center">
+                              <button
+                                onClick={() => handleDelete(rule.id)}
+                                className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover/row:opacity-100"
+                                title="删除此阶梯"
+                              >
+                                <Trash2 className="w-4 h-4 mx-auto" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
+        
       </div>
     </div>
   );

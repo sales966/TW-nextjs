@@ -19,29 +19,27 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { material, size, quantity, unitPrice, totalPrice } = body;
+    const { material, size, tiers } = body;
 
-    if (!material || !size || !quantity || !unitPrice) {
-      return NextResponse.json({ success: false, error: "缺少必填字段" }, { status: 400 });
+    if (!material || !size || !tiers || !Array.isArray(tiers) || tiers.length === 0) {
+      return NextResponse.json({ success: false, error: "缺少必填字段或价格阶梯为空" }, { status: 400 });
     }
 
-    const calculatedTotal = totalPrice || (unitPrice * quantity);
+    const dataToInsert = tiers.map((tier: any) => ({
+      material,
+      size,
+      quantity: parseInt(tier.quantity),
+      unitPrice: parseFloat(tier.unitPrice),
+      totalPrice: parseFloat(tier.unitPrice) * parseInt(tier.quantity),
+    }));
 
-    const rule = await prisma.pricingRule.create({
-      data: {
-        material,
-        size,
-        quantity: parseInt(quantity),
-        unitPrice: parseFloat(unitPrice),
-        totalPrice: parseFloat(calculatedTotal),
-      }
+    const result = await prisma.pricingRule.createMany({
+      data: dataToInsert,
+      skipDuplicates: true, // 避免因为同一阶梯已存在而报错，直接跳过重复项
     });
 
-    return NextResponse.json({ success: true, data: rule });
+    return NextResponse.json({ success: true, count: result.count });
   } catch (error: any) {
-    if (error.code === 'P2002') {
-      return NextResponse.json({ success: false, error: "该材质、尺寸和数量的报价规则已存在，请直接修改或删除" }, { status: 400 });
-    }
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
