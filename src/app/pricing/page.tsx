@@ -141,7 +141,8 @@ export default function PricingPage() {
             <p>Admin has not configured any pricing rules yet.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl border border-[#101828]/5 shadow-sm overflow-hidden">
+          <>
+            <div className="bg-white rounded-3xl border border-[#101828]/5 shadow-sm overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12">
               
               {/* Left Side: Selectors */}
@@ -234,23 +235,26 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                {/* Call to action inside card */}
-                <div className="mt-12 p-6 bg-[#101828] rounded-2xl text-white">
-                  <h4 className="text-lg font-bold mb-2">{t.ctaTitle}</h4>
-                  <p className="text-sm text-[#98A2B3] mb-6 leading-relaxed">
-                    {t.ctaDesc}
-                  </p>
-                  <Link 
-                    href="/quote"
-                    className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 bg-white text-[#101828] text-[14px] font-bold rounded hover:bg-slate-100 transition-colors"
-                  >
-                    {t.ctaBtn} <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
-                </div>
-
               </div>
             </div>
           </div>
+
+          {/* Call to action below the calculator */}
+          <div className="mt-12 p-8 md:p-12 bg-[#101828] rounded-3xl text-white flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-xl">
+            <div className="max-w-2xl">
+              <h4 className="text-2xl font-bold mb-3">{t.ctaTitle}</h4>
+              <p className="text-[#98A2B3] leading-relaxed text-lg">
+                {t.ctaDesc}
+              </p>
+            </div>
+            <Link 
+              href="/quote"
+              className="shrink-0 inline-flex items-center justify-center px-8 py-4 bg-white text-[#101828] text-[15px] font-bold rounded hover:bg-slate-100 transition-colors"
+            >
+              {t.ctaBtn} <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+          </div>
+        </>
         )}
       </div>
     </div>
