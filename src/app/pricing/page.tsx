@@ -18,8 +18,8 @@ export default function PricingPage() {
   const text = {
     en: {
       title: "Cost Estimator",
-      desc: "Select your preferred material and dimensions to instantly view our tiered wholesale pricing matrix. These are factory-direct estimates designed to help you plan your budget.",
-      matLabel: "1. Select Material",
+      desc: "Select your preferred product name and dimensions to instantly view our tiered wholesale pricing matrix. These are factory-direct estimates designed to help you plan your budget.",
+      matLabel: "1. Select Product",
       sizeLabel: "2. Select Dimensions (L×W×H)",
       resultTitle: "Estimated Wholesale Pricing",
       qty: "Quantity",
@@ -33,8 +33,8 @@ export default function PricingPage() {
     },
     zh: {
       title: "在线估价计算器",
-      desc: "请选择您所需的材质与尺寸，系统将即时显示工厂直供的阶梯参考价格。此价格矩阵旨在帮助您快速评估包装预算。",
-      matLabel: "1. 选择纸袋材质",
+      desc: "请选择您所需的商品名与尺寸，系统将即时显示工厂直供的阶梯参考价格。此价格矩阵旨在帮助您快速评估包装预算。",
+      matLabel: "1. 选择商品名",
       sizeLabel: "2. 选择长宽高尺寸",
       resultTitle: "出厂参考报价矩阵",
       qty: "起订量 (个)",
@@ -48,8 +48,8 @@ export default function PricingPage() {
     },
     tw: {
       title: "線上估價計算器",
-      desc: "請選擇您所需的材質與尺寸，系統將即時顯示工廠直供的階梯參考價格。此價格矩陣旨在幫助您快速評估包裝預算。",
-      matLabel: "1. 選擇紙袋材質",
+      desc: "請選擇您所需的商品名與尺寸，系統將即時顯示工廠直供的階梯參考價格。此價格矩陣旨在幫助您快速評估包裝預算。",
+      matLabel: "1. 選擇商品名",
       sizeLabel: "2. 選擇長寬高尺寸",
       resultTitle: "出廠參考報價矩陣",
       qty: "起訂量 (個)",

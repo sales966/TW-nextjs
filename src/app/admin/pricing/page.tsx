@@ -117,7 +117,7 @@ export default function PricingRulesPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">选择材质与工艺</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">商品名</label>
                 <input
                   type="text"
                   list="material-options"
