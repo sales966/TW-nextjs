@@ -20,6 +20,8 @@ export default function PricingRulesPage() {
   // 编辑状态
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState<string>("");
+  const [editQuantity, setEditQuantity] = useState<string>("");
+  const [editSize, setEditSize] = useState<string>("");
 
   const [tiers, setTiers] = useState([
     { quantity: "500", unitPrice: "" },
@@ -92,17 +94,23 @@ export default function PricingRulesPage() {
   };
 
   const handleSaveEdit = async (rule: any) => {
-    if (!editPrice) return;
+    if (!editPrice || !editQuantity || !editSize) return alert("请填写完整的尺寸、数量和单价");
     try {
       const res = await fetch(`/api/admin/pricing/${rule.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ unitPrice: editPrice, quantity: rule.quantity }),
+        body: JSON.stringify({ 
+          unitPrice: editPrice, 
+          quantity: editQuantity,
+          size: editSize 
+        }),
       });
       const data = await res.json();
       if (data.success) {
         setEditingId(null);
         setEditPrice("");
+        setEditQuantity("");
+        setEditSize("");
         fetchRules();
       } else {
         alert("修改失败");
@@ -356,14 +364,35 @@ export default function PricingRulesPage() {
                             {group.map((rule: any) => (
                               <div key={rule.id} className="grid grid-cols-4 items-center py-2 px-2 rounded-lg hover:bg-slate-50 transition-colors group/row">
                                 <div className="font-bold text-slate-900 text-sm">
-                                  {rule.quantity.toLocaleString()} 个
+                                  {editingId === rule.id ? (
+                                    <div className="flex flex-col gap-1.5 w-full pr-2">
+                                      <input
+                                        type="text"
+                                        value={editSize}
+                                        onChange={(e) => setEditSize(e.target.value)}
+                                        className="w-full px-2 py-1 text-xs border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="修改尺寸"
+                                      />
+                                      <div className="flex items-center gap-1">
+                                        <input
+                                          type="number"
+                                          value={editQuantity}
+                                          onChange={(e) => setEditQuantity(e.target.value)}
+                                          className="w-16 px-2 py-1 text-xs border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                          placeholder="数量"
+                                        />
+                                        <span className="text-xs text-slate-400">个</span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    `${rule.quantity.toLocaleString()} 个`
+                                  )}
                                 </div>
                                 <div className="text-right font-bold text-blue-600 text-sm">
                                   {editingId === rule.id ? (
                                     <input
                                       type="number"
                                       step="0.001"
-                                      autoFocus
                                       value={editPrice}
                                       onChange={(e) => setEditPrice(e.target.value)}
                                       className="w-20 px-2 py-1 text-right border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -402,6 +431,8 @@ export default function PricingRulesPage() {
                                         onClick={() => {
                                           setEditingId(rule.id);
                                           setEditPrice(rule.unitPrice.toString());
+                                          setEditQuantity(rule.quantity.toString());
+                                          setEditSize(rule.size);
                                         }}
                                         className="text-slate-400 hover:text-blue-500 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
                                         title="编辑此阶梯"

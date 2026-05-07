@@ -19,15 +19,17 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     const params = await props.params;
     const { id } = params;
     const body = await req.json();
-    const { unitPrice, quantity } = body;
+    const { unitPrice, quantity, size } = body;
     
-    if (!unitPrice) {
+    if (!unitPrice || !quantity) {
       return NextResponse.json({ success: false, error: "缺少必填参数" }, { status: 400 });
     }
 
     const updatedRule = await prisma.pricingRule.update({
       where: { id },
       data: {
+        ...(size && { size }),
+        quantity: parseInt(quantity),
         unitPrice: parseFloat(unitPrice),
         totalPrice: parseFloat(unitPrice) * parseInt(quantity),
       }
