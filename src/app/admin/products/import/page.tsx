@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { UploadCloud, FileType, CheckCircle2, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { UploadCloud, FileType, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 
 export default function SimpleImportPage() {
@@ -89,8 +89,16 @@ export default function SimpleImportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center py-16 px-6">
-      <div className="max-w-3xl w-full mb-10 text-center">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center py-16 px-6 relative">
+      <Link 
+        href="/admin/products"
+        className="absolute top-8 left-8 flex items-center text-slate-500 hover:text-slate-900 transition-colors font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" />
+        返回产品库
+      </Link>
+      
+      <div className="max-w-3xl w-full mb-10 text-center mt-4">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-4">一键产品导入系统</h1>
         <p className="text-slate-500 text-base max-w-xl mx-auto">
           抛弃繁琐的映射。只需上传 CSV 表格和 JPG 图片多选，后端将通过模糊搜索为您自动完成字段匹配、单位转换和数据清洗。
