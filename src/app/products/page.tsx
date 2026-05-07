@@ -68,18 +68,6 @@ export default function ProductsPage() {
                ))}
              </div>
            </div>
-
-           <div>
-             <h4 className="font-semibold text-[#101828] mb-4 tracking-tight text-[15px]">{tp.eco}</h4>
-             <div className="space-y-4">
-               {tp.ecos.map(eco => (
-                 <label key={eco} className="flex items-center gap-3 cursor-pointer group">
-                   <div className="w-4 h-4 border-[1.5px] border-[#101828]/30 rounded-[2px] group-hover:border-[#101828] transition-colors flex items-center justify-center"></div>
-                   <span className="text-[#667085] text-[14px] font-medium group-hover:text-[#101828]">{eco}</span>
-                 </label>
-               ))}
-             </div>
-           </div>
         </aside>
 
         <div className="flex-1">
