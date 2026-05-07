@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useRef } from "react";
 import { UploadCloud, FileType, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 
