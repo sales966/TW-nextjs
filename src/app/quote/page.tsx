@@ -14,6 +14,7 @@ export default function QuotePage() {
     const formData = new FormData(e.currentTarget);
     const data = {
       company: formData.get("company"),
+      companyName: formData.get("companyName"),
       quantity: formData.get("quantity"),
       message: formData.get("message"),
       firstName: formData.get("firstName"),
@@ -99,6 +100,10 @@ export default function QuotePage() {
              <div className="space-y-8 pb-8">
                 <div className="pb-6 border-b border-[#101828]/10 mb-8">
                    <h3 className="text-2xl font-black tracking-tight">{tq.formB3}</h3>
+                </div>
+                <div className="mb-10">
+                  <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{(tq as any).companyName}</label>
+                  <input name="companyName" type="text" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div>

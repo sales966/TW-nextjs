@@ -133,7 +133,7 @@ const dictionaries = {
     quote: {
       title: "Request a Quote", sub: "Fill out the form below with your requirements, and our team will get back to you with competitive pricing.",
       s1: "Basic Needs", s2: "Specifications", s3: "Contact Details",
-      fname: "First Name", lname: "Last Name", email: "Email Address", phone: "Phone Number", comp: "Product Name", qty: "Estimated Quantity", msg: "Project Details & Specific Requirements", submit: "Submit Inquiry",
+      fname: "First Name", lname: "Last Name", email: "Email Address", phone: "Phone Number", comp: "Product Name", companyName: "Company Name", qty: "Estimated Quantity", msg: "Project Details & Specific Requirements", submit: "Submit Inquiry",
       formB1: "Project Scope", formB2: "Dimensions & Materials", formB3: "Your Contact Info",
       btnBack: "Back", btnNext: "Next",
       opt1: "1,000 - 5,000", opt2: "5,000 - 20,000", opt3: "20,000 - 100,000", opt4: "100,000+",
@@ -277,7 +277,7 @@ const dictionaries = {
     quote: {
       title: "定制需求表单", sub: "请尽可能详细地说明您的包装规格要求（例如具体尺寸、印刷色系），这将有助于我们更精准、快速地为您预估出厂价格。",
       s1: "基础信息", s2: "规格与工艺", s3: "联系方式",
-      fname: "名字", lname: "姓氏", email: "电子邮箱", phone: "联系电话", comp: "产品名称", qty: "预估采购数量", msg: "项目细节与其他特殊要求", submit: "提交询价申请",
+      fname: "名字", lname: "姓氏", email: "电子邮箱", phone: "联系电话", comp: "产品名称", companyName: "公司名称", qty: "预估采购数量", msg: "项目细节与其他特殊要求", submit: "提交询价申请",
       formB1: "确认所需大致范围", formB2: "尺寸长宽高与用纸情况", formB3: "获取报价的联络方式",
       btnBack: "上一步", btnNext: "下一步",
       opt1: "1,000 - 5,000 件", opt2: "5,000 - 20,000 件", opt3: "20,000 - 100,000 件", opt4: "100,000 件以上",
@@ -421,7 +421,7 @@ const dictionaries = {
     quote: {
       title: "客製需求表單", sub: "請盡可能詳細地說明您的包裝規格要求（例如具體尺寸、印刷色系），這將有助於我們更精準、快速地為您預估出廠價格。",
       s1: "基礎資訊", s2: "規格與工藝", s3: "聯絡方式",
-      fname: "名字", lname: "姓氏", email: "電子信箱", phone: "聯絡電話", comp: "產品名稱", qty: "預估採購數量", msg: "專案細節與其他特殊要求", submit: "提交詢價申請",
+      fname: "名字", lname: "姓氏", email: "電子信箱", phone: "聯絡電話", comp: "產品名稱", companyName: "公司名稱", qty: "預估採購數量", msg: "專案細節與其他特殊要求", submit: "提交詢價申請",
       formB1: "確認所需大致範圍", formB2: "尺寸長寬高與用紙情況", formB3: "獲取報價的聯絡方式",
       btnBack: "上一步", btnNext: "下一步",
       opt1: "1,000 - 5,000 件", opt2: "5,000 - 20,000 件", opt3: "20,000 - 100,000 件", opt4: "100,000 件以上",

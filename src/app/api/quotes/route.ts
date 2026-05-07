@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { company, quantity, message, firstName, lastName, email, phone } = body;
+    const { company, companyName, quantity, message, firstName, lastName, email, phone } = body;
 
     if (!email || !firstName) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
@@ -21,11 +21,13 @@ export async function POST(req: Request) {
       where: { email },
       update: {
         contactName,
+        companyName: companyName || null,
         phone: phone || null,
       },
       create: {
         email,
         contactName,
+        companyName: companyName || null,
         phone: phone || null,
         country: "Unknown", // Required by schema
       }
