@@ -13,6 +13,9 @@ export default function PricingRulesPage() {
     size: "12.8cm*9.5cm*22cm",
   });
 
+  // 后台看板查看状态
+  const [viewProduct, setViewProduct] = useState<string | null>(null);
+
   const [tiers, setTiers] = useState([
     { quantity: "500", unitPrice: "" },
     { quantity: "2000", unitPrice: "" },
@@ -83,13 +86,26 @@ export default function PricingRulesPage() {
     }
   };
 
-  // 按照 材质+尺寸 分组数据
-  const groupedRules = rules.reduce((acc: any, rule: any) => {
-    const key = `${rule.material}|${rule.size}`;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(rule);
-    return acc;
-  }, {});
+  // 提取唯一的商品名 (用于看板左侧)
+  const uniqueProducts = Array.from(new Set(rules.map((r: any) => r.material)));
+
+  // 默认选中第一个商品
+  useEffect(() => {
+    if (uniqueProducts.length > 0 && !viewProduct) {
+      setViewProduct(uniqueProducts[0] as string);
+    }
+  }, [uniqueProducts, viewProduct]);
+
+  // 根据选中的商品提取对应的尺寸和数据
+  const groupedSizes = rules
+    .filter((r: any) => r.material === viewProduct)
+    .reduce((acc: any, rule: any) => {
+      if (!acc[rule.size]) acc[rule.size] = [];
+      acc[rule.size].push(rule);
+      // 对阶梯数量进行排序
+      acc[rule.size].sort((a: any, b: any) => a.quantity - b.quantity);
+      return acc;
+    }, {});
 
   return (
     <div className="min-h-screen bg-[#fafafa] p-8 lg:p-12 font-sans">
@@ -234,7 +250,7 @@ export default function PricingRulesPage() {
           
           {isLoading ? (
             <div className="p-20 flex justify-center"><Loader2 className="w-8 h-8 text-[#101828] animate-spin" /></div>
-          ) : Object.keys(groupedRules).length === 0 ? (
+          ) : uniqueProducts.length === 0 ? (
             <div className="p-24 text-center text-slate-500">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Box className="w-8 h-8 text-slate-300" />
@@ -243,60 +259,88 @@ export default function PricingRulesPage() {
               <p className="text-sm">请使用上方的工作台批量录入</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
-              {Object.entries(groupedRules).map(([key, group]: [string, any]) => {
-                const [material, size] = key.split('|');
-                return (
-                  <div key={key} className="flex flex-col lg:flex-row hover:bg-slate-50/30 transition-colors">
-                    {/* 左侧大类信息 */}
-                    <div className="lg:w-1/3 p-6 lg:p-8 bg-slate-50/50 lg:bg-transparent border-b lg:border-b-0 lg:border-r border-slate-100">
-                      <div className="inline-block px-3 py-1 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider rounded-md mb-3">
-                        产品组合
-                      </div>
-                      <h3 className="text-lg font-black text-slate-900 mb-1">{material}</h3>
-                      <p className="text-slate-500 font-medium text-sm flex items-center">
-                        <span className="w-2 h-2 rounded-full bg-slate-300 mr-2"></span>
-                        {size}
-                      </p>
-                    </div>
-                    
-                    {/* 右侧阶梯明细 */}
-                    <div className="lg:w-2/3 p-6 lg:p-8">
-                      <div className="grid grid-cols-4 text-xs font-bold text-slate-400 uppercase tracking-wider pb-3 border-b border-slate-100 mb-3">
-                        <div>订购数量</div>
-                        <div className="text-right">预估单价</div>
-                        <div className="text-right">预估总价</div>
-                        <div className="text-center">操作</div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        {group.map((rule: any) => (
-                          <div key={rule.id} className="grid grid-cols-4 items-center py-2 px-3 -mx-3 rounded-lg hover:bg-slate-100 transition-colors group/row">
-                            <div className="font-bold text-slate-900 text-sm">
-                              {rule.quantity.toLocaleString()} 个
-                            </div>
-                            <div className="text-right font-bold text-blue-600 text-sm">
-                              ${rule.unitPrice.toFixed(3)}
-                            </div>
-                            <div className="text-right font-medium text-slate-700 text-sm">
-                              ${rule.totalPrice.toFixed(2)}
-                            </div>
-                            <div className="text-center">
-                              <button
-                                onClick={() => handleDelete(rule.id)}
-                                className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover/row:opacity-100"
-                                title="删除此阶梯"
-                              >
-                                <Trash2 className="w-4 h-4 mx-auto" />
-                              </button>
-                            </div>
+            <div className="flex flex-col md:flex-row min-h-[500px]">
+              {/* 左侧：商品导航树 */}
+              <div className="md:w-1/3 lg:w-1/4 border-r border-slate-100 bg-slate-50/30 p-4">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">选择商品名</h3>
+                <div className="flex flex-col gap-1">
+                  {uniqueProducts.map((product: any) => (
+                    <button
+                      key={product}
+                      onClick={() => setViewProduct(product)}
+                      className={`text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                        viewProduct === product
+                          ? 'bg-[#101828] text-white shadow-md'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      {product}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 右侧：尺寸与阶梯详情 */}
+              <div className="md:w-2/3 lg:w-3/4 p-6 lg:p-8 bg-white">
+                <div className="mb-6 pb-4 border-b border-slate-100">
+                  <h3 className="text-xl font-black text-slate-900">{viewProduct}</h3>
+                  <p className="text-sm text-slate-500 mt-1">此商品下配置的所有尺寸与阶梯价</p>
+                </div>
+
+                {Object.keys(groupedSizes).length === 0 ? (
+                  <p className="text-slate-500 italic">该商品暂无尺寸数据。</p>
+                ) : (
+                  <div className="space-y-6">
+                    {Object.entries(groupedSizes).map(([size, group]: [string, any]) => (
+                      <div key={size} className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                        <div className="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 mr-3"></span>
+                            <span className="font-bold text-slate-800 text-sm">{size}</span>
                           </div>
-                        ))}
+                          <span className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200">
+                            {group.length} 个阶梯
+                          </span>
+                        </div>
+                        
+                        <div className="p-4">
+                          <div className="grid grid-cols-4 text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100 mb-2 px-2">
+                            <div>订购数量</div>
+                            <div className="text-right">预估单价</div>
+                            <div className="text-right">预估总价</div>
+                            <div className="text-center">操作</div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            {group.map((rule: any) => (
+                              <div key={rule.id} className="grid grid-cols-4 items-center py-2 px-2 rounded-lg hover:bg-slate-50 transition-colors group/row">
+                                <div className="font-bold text-slate-900 text-sm">
+                                  {rule.quantity.toLocaleString()} 个
+                                </div>
+                                <div className="text-right font-bold text-blue-600 text-sm">
+                                  ${rule.unitPrice.toFixed(3)}
+                                </div>
+                                <div className="text-right font-medium text-slate-700 text-sm">
+                                  ${rule.totalPrice.toFixed(2)}
+                                </div>
+                                <div className="text-center">
+                                  <button
+                                    onClick={() => handleDelete(rule.id)}
+                                    className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover/row:opacity-100 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
+                                    title="删除此阶梯"
+                                  >
+                                    <Trash2 className="w-4 h-4 mx-auto" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                );
-              })}
+                )}
+              </div>
             </div>
           )}
         </div>
