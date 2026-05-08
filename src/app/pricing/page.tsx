@@ -173,17 +173,10 @@ export default function PricingPage() {
       return;
     }
     const dest = selectedDestination.toLowerCase();
-    if (dest.includes("uk")) setCurrency("GBP");
-    else if (dest.includes("europe") || dest.includes("eu")) setCurrency("EUR");
-    else if (dest.includes("australia")) setCurrency("AUD");
-    else if (dest.includes("canada")) setCurrency("CAD");
-    else if (dest.includes("new zealand")) setCurrency("NZD");
-    else if (dest.includes("japan")) setCurrency("JPY");
-    else if (dest.includes("singapore")) setCurrency("SGD");
-    else if (dest.includes("korea")) setCurrency("KRW");
-    else if (dest.includes("mexico")) setCurrency("MXN");
-    else if (dest.includes("uae") || dest.includes("middle east")) setCurrency("AED");
-    else setCurrency("USD");
+    if (dest.includes("japan")) setCurrency("JPY");
+    else if (dest.includes("dubai") || dest.includes("uae")) setCurrency("AED");
+    else if (dest.includes("taiwan")) setCurrency("TWD");
+    else setCurrency("USD"); // USA 默认使用 USD
   }, [selectedDestination]);
 
   // 货币格式化工具

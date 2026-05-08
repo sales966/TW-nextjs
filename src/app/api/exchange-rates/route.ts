@@ -26,15 +26,9 @@ export async function GET() {
     // 降级处理：如果 API 失败，返回常见的粗略汇率以保证系统可用
     const fallbackRates = {
       USD: 1,
-      EUR: 0.92,
-      GBP: 0.79,
-      AUD: 1.5,
-      CAD: 1.35,
-      NZD: 1.65,
-      SGD: 1.35,
       JPY: 150.0,
-      KRW: 1350.0,
-      MXN: 17.0,
+      AED: 3.67,
+      TWD: 32.5,
       CNY: 7.2
     };
     return NextResponse.json({ success: true, rates: fallbackRates, fallback: true });
