@@ -4,8 +4,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Loader2, Calculator, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import Link from "next/link";
-
 import Image from "next/image";
+
+const getMaterialImage = (materialName: string) => {
+  if (materialName.includes('普通纸')) return '/images/pricing/bag_plain.png';
+  if (materialName.includes('牛皮')) return '/images/pricing/bag_kraft.png';
+  if (materialName.includes('铜版纸')) return '/images/pricing/bag_coated.png';
+  if (materialName.includes('黑卡')) return '/images/pricing/bag_black.png';
+  return '/images/pricing/bag_plain.png';
+};
 
 export function HomePricing() {
   const { lang } = useI18n();
@@ -57,16 +64,6 @@ export function HomePricing() {
     });
   }, [rules]);
 
-  // 根据商品材质名称自动匹配默认图片
-  const getImageForMaterial = (material: string) => {
-    const m = material.toLowerCase();
-    if (m.includes("牛皮")) return "/images/home/craft_kraft.png";
-    if (m.includes("黑卡")) return "/images/home/cat_luxury_v3.png";
-    if (m.includes("铜版纸") || m.includes("4色") || m.includes("四色")) return "/images/home/cat_craft.png";
-    if (m.includes("普通纸")) return "/images/home/craft_cardboard.png";
-    return "/images/home/cat_retail.png"; // 兜底图片
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center py-20">
@@ -87,58 +84,51 @@ export function HomePricing() {
           <button
             key={idx}
             onClick={() => setActiveTab(idx)}
-            className={`px-6 py-4 text-[14px] font-bold tracking-wide transition-colors ${
+            className={`flex items-center px-6 py-4 text-[14px] font-bold tracking-wide transition-all ${
               activeTab === idx
-                ? "text-[#101828] border-b-2 border-[#101828] bg-white"
-                : "text-[#667085] hover:text-[#101828] hover:bg-[#101828]/[0.02]"
+                ? "text-[#101828] border-b-2 border-[#101828] bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative z-10"
+                : "text-[#667085] hover:text-[#101828] hover:bg-[#101828]/[0.02] border-b-2 border-transparent"
             }`}
           >
+            <div className={`relative w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0 border transition-all duration-300 ${activeTab === idx ? 'border-[#101828]/20 shadow-md scale-110' : 'border-[#101828]/10 shadow-sm opacity-80'}`}>
+              <Image 
+                src={getMaterialImage(product.material)} 
+                alt={product.material}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            </div>
             {product.material}
           </button>
         ))}
       </div>
 
-      {/* 主体：选中的材质对应的图片、尺寸和阶梯价 */}
+      {/* 主体：选中的材质对应的尺寸和阶梯价 */}
       <div className="p-6 md:p-10">
         {activeProduct && (
-          <div className="flex flex-col lg:flex-row gap-10">
-            {/* 左侧：智能配图 */}
-            <div className="w-full lg:w-1/3 shrink-0">
-              <div className="aspect-[4/3] lg:aspect-square relative rounded-xl overflow-hidden bg-[#F6F4EF] border border-[#101828]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                <Image 
-                  src={getImageForMaterial(activeProduct.material)} 
-                  fill 
-                  alt={activeProduct.material} 
-                  className="object-cover object-center hover:scale-105 transition-transform duration-700" 
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                />
-              </div>
-            </div>
-
-            {/* 右侧：网格数据 */}
-            <div className="w-full lg:w-2/3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-10 content-start">
-              {activeProduct.sizesList.map((sz: any, i: number) => (
-                <div key={i} className="flex flex-col">
-                  <div className="text-[12px] font-bold text-[#101828] uppercase tracking-widest mb-4 pb-2 border-b border-[#101828]/10 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-[#101828] mr-3 rounded-full opacity-80"></div>
-                    {sz.name}
-                  </div>
-                  
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest mb-1">
-                      <span>{lang === 'zh' ? '起订量' : lang === 'tw' ? '起訂量' : 'QTY'}</span>
-                      <span>{lang === 'zh' ? '单价' : lang === 'tw' ? '單價' : 'EXW'}</span>
-                    </div>
-                    {sz.tiers.map((tier: any, j: number) => (
-                      <div key={j} className="flex justify-between items-center text-[14px]">
-                        <span className="font-medium text-[#667085]">{tier.quantity.toLocaleString()} pcs</span>
-                        <span className="font-semibold text-[#101828]">${tier.unitPrice.toFixed(3)}</span>
-                      </div>
-                    ))}
-                  </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-10">
+            {activeProduct.sizesList.map((sz: any, i: number) => (
+              <div key={i} className="flex flex-col">
+                <div className="text-[12px] font-bold text-[#101828] uppercase tracking-widest mb-4 pb-2 border-b border-[#101828]/10 flex items-center">
+                  <div className="w-1.5 h-1.5 bg-[#101828] mr-3 rounded-full opacity-80"></div>
+                  {sz.name}
                 </div>
-              ))}
-            </div>
+                
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest mb-1">
+                    <span>{lang === 'zh' ? '起订量' : lang === 'tw' ? '起訂量' : 'QTY'}</span>
+                    <span>{lang === 'zh' ? '单价' : lang === 'tw' ? '單價' : 'EXW'}</span>
+                  </div>
+                  {sz.tiers.map((tier: any, j: number) => (
+                    <div key={j} className="flex justify-between items-center text-[14px]">
+                      <span className="font-medium text-[#667085]">{tier.quantity.toLocaleString()} pcs</span>
+                      <span className="font-semibold text-[#101828]">${tier.unitPrice.toFixed(3)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
