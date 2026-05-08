@@ -107,13 +107,6 @@ export default function PricingPage() {
       })
       .catch(err => console.error(err));
   }, []);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setIsLoading(false);
-      });
-  }, []);
 
   // 提取唯一的材质
   const materials = useMemo(() => {
