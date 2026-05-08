@@ -18,10 +18,9 @@ export default function PricingRulesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   
   // 编辑状态
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editPrice, setEditPrice] = useState<string>("");
-  const [editQuantity, setEditQuantity] = useState<string>("");
-  const [editSize, setEditSize] = useState<string>("");
+  const [editingProduct, setEditingProduct] = useState<string | null>(null);
+  const [editedProductName, setEditedProductName] = useState("");
+  const [editedRules, setEditedRules] = useState<any[]>([]);
 
   const [tiers, setTiers] = useState([
     { quantity: "500", unitPrice: "" },
@@ -93,30 +92,38 @@ export default function PricingRulesPage() {
     }
   };
 
-  const handleSaveEdit = async (rule: any) => {
-    if (!editPrice || !editQuantity || !editSize) return alert("请填写完整的尺寸、数量和单价");
+  const handleEditProduct = () => {
+    const productRules = rules.filter((r: any) => r.material === viewProduct);
+    setEditedRules(JSON.parse(JSON.stringify(productRules)));
+    setEditedProductName(viewProduct || "");
+    setEditingProduct(viewProduct);
+  };
+
+  const handleSaveProduct = async () => {
     try {
-      const res = await fetch(`/api/admin/pricing/${rule.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          unitPrice: editPrice, 
-          quantity: editQuantity,
-          size: editSize 
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setEditingId(null);
-        setEditPrice("");
-        setEditQuantity("");
-        setEditSize("");
-        fetchRules();
-      } else {
-        alert("修改失败");
+      setIsSubmitting(true);
+      await Promise.all(editedRules.map(rule => 
+        fetch(`/api/admin/pricing/${rule.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            material: editedProductName,
+            unitPrice: rule.unitPrice.toString(), 
+            quantity: rule.quantity.toString(),
+            size: rule.size 
+          }),
+        })
+      ));
+      
+      setEditingProduct(null);
+      if (editedProductName !== viewProduct) {
+        setViewProduct(editedProductName);
       }
-    } catch (error) {
-      console.error(error);
+      fetchRules();
+    } catch (err) {
+      alert("保存出错");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -132,8 +139,8 @@ export default function PricingRulesPage() {
   }, [uniqueProducts, viewProduct]);
 
   // 根据选中的商品提取对应的尺寸和数据
-  const groupedSizes = rules
-    .filter((r: any) => r.material === viewProduct)
+  const activeRules = editingProduct === viewProduct ? editedRules : rules.filter((r: any) => r.material === viewProduct);
+  const groupedSizes = activeRules
     .reduce((acc: any, rule: any) => {
       if (!acc[rule.size]) acc[rule.size] = [];
       acc[rule.size].push(rule);
@@ -331,9 +338,48 @@ export default function PricingRulesPage() {
 
               {/* 右侧：尺寸与阶梯详情 */}
               <div className="md:w-2/3 lg:w-3/4 p-6 lg:p-8 bg-white">
-                <div className="mb-6 pb-4 border-b border-slate-100">
-                  <h3 className="text-xl font-black text-slate-900">{viewProduct}</h3>
-                  <p className="text-sm text-slate-500 mt-1">此商品下配置的所有尺寸与阶梯价</p>
+                <div className="mb-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+                  <div>
+                    {editingProduct === viewProduct ? (
+                      <input
+                        type="text"
+                        value={editedProductName}
+                        onChange={(e) => setEditedProductName(e.target.value)}
+                        className="text-xl font-black text-slate-900 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700 bg-blue-50/50 px-2 py-1 rounded"
+                        placeholder="商品名称"
+                      />
+                    ) : (
+                      <h3 className="text-xl font-black text-slate-900">{viewProduct}</h3>
+                    )}
+                    <p className="text-sm text-slate-500 mt-2">此商品下配置的所有尺寸与阶梯价</p>
+                  </div>
+                  <div>
+                    {editingProduct === viewProduct ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingProduct(null)}
+                          className="px-4 py-2 text-sm font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                        >
+                          取消
+                        </button>
+                        <button
+                          onClick={handleSaveProduct}
+                          disabled={isSubmitting}
+                          className="flex items-center px-4 py-2 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg transition disabled:opacity-50"
+                        >
+                          {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Save className="w-4 h-4 mr-1.5" />}
+                          保存全部修改
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleEditProduct}
+                        className="flex items-center px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                      >
+                        <Edit2 className="w-4 h-4 mr-1.5" /> 编辑此商品
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {Object.keys(groupedSizes).length === 0 ? (
@@ -345,7 +391,11 @@ export default function PricingRulesPage() {
                         <div className="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
                           <div className="flex items-center">
                             <span className="w-2 h-2 rounded-full bg-blue-500 mr-3"></span>
-                            <span className="font-bold text-slate-800 text-sm">{size}</span>
+                            {editingProduct === viewProduct ? (
+                                <span className="font-bold text-slate-800 text-sm">尺寸分组：{size} (编辑模式下修改下方尺寸即可)</span>
+                            ) : (
+                                <span className="font-bold text-slate-800 text-sm">{size}</span>
+                            )}
                           </div>
                           <span className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200">
                             {group.length} 个阶梯
@@ -353,35 +403,44 @@ export default function PricingRulesPage() {
                         </div>
                         
                         <div className="p-4">
-                          <div className="grid grid-cols-4 text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100 mb-2 px-2">
-                            <div>订购数量</div>
+                          <div className="grid grid-cols-3 text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100 mb-2 px-2">
+                            <div>订购数量 {editingProduct === viewProduct && "(及尺寸)"}</div>
                             <div className="text-right">预估单价</div>
                             <div className="text-right">预估总价</div>
-                            <div className="text-center">操作</div>
                           </div>
                           
                           <div className="space-y-1">
                             {group.map((rule: any) => (
-                              <div key={rule.id} className="grid grid-cols-4 items-center py-2 px-2 rounded-lg hover:bg-slate-50 transition-colors group/row">
+                              <div key={rule.id} className="grid grid-cols-3 items-center py-2 px-2 rounded-lg hover:bg-slate-50 transition-colors group/row">
                                 <div className="font-bold text-slate-900 text-sm">
-                                  {editingId === rule.id ? (
-                                    <div className="flex flex-col gap-1.5 w-full pr-2">
+                                  {editingProduct === viewProduct ? (
+                                    <div className="flex flex-col gap-2 w-full pr-4">
                                       <input
                                         type="text"
-                                        value={editSize}
-                                        onChange={(e) => setEditSize(e.target.value)}
-                                        className="w-full px-2 py-1 text-xs border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        value={rule.size}
+                                        onChange={(e) => {
+                                          const newRules = [...editedRules];
+                                          const target = newRules.find(r => r.id === rule.id);
+                                          if(target) target.size = e.target.value;
+                                          setEditedRules(newRules);
+                                        }}
+                                        className="w-full px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
                                         placeholder="修改尺寸"
                                       />
-                                      <div className="flex items-center gap-1">
+                                      <div className="flex items-center gap-1.5">
                                         <input
                                           type="number"
-                                          value={editQuantity}
-                                          onChange={(e) => setEditQuantity(e.target.value)}
-                                          className="w-16 px-2 py-1 text-xs border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                          value={rule.quantity}
+                                          onChange={(e) => {
+                                            const newRules = [...editedRules];
+                                            const target = newRules.find(r => r.id === rule.id);
+                                            if(target) target.quantity = Number(e.target.value);
+                                            setEditedRules(newRules);
+                                          }}
+                                          className="w-20 px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
                                           placeholder="数量"
                                         />
-                                        <span className="text-xs text-slate-400">个</span>
+                                        <span className="text-xs text-slate-500 font-medium">个</span>
                                       </div>
                                     </div>
                                   ) : (
@@ -389,65 +448,43 @@ export default function PricingRulesPage() {
                                   )}
                                 </div>
                                 <div className="text-right font-bold text-blue-600 text-sm">
-                                  {editingId === rule.id ? (
-                                    <input
-                                      type="number"
-                                      step="0.001"
-                                      value={editPrice}
-                                      onChange={(e) => setEditPrice(e.target.value)}
-                                      className="w-20 px-2 py-1 text-right border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                    />
+                                  {editingProduct === viewProduct ? (
+                                    <div className="flex justify-end">
+                                      <span className="text-slate-400 mr-1.5 pt-1.5">$</span>
+                                      <input
+                                        type="number"
+                                        step="0.001"
+                                        value={rule.unitPrice}
+                                        onChange={(e) => {
+                                          const newRules = [...editedRules];
+                                          const target = newRules.find(r => r.id === rule.id);
+                                          if(target) target.unitPrice = Number(e.target.value);
+                                          setEditedRules(newRules);
+                                        }}
+                                        className="w-24 px-2 py-1.5 text-right border border-blue-200 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                      />
+                                    </div>
                                   ) : (
                                     `$${rule.unitPrice.toFixed(3)}`
                                   )}
                                 </div>
-                                <div className="text-right font-medium text-slate-700 text-sm">
-                                  {editingId === rule.id ? (
+                                <div className="text-right font-medium text-slate-700 text-sm flex justify-end items-center gap-4">
+                                  {editingProduct === viewProduct ? (
                                     <span className="text-slate-400">自动计算</span>
                                   ) : (
                                     `$${rule.totalPrice.toFixed(2)}`
                                   )}
-                                </div>
-                                <div className="text-center">
-                                  {editingId === rule.id ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                      <button
-                                        onClick={() => handleSaveEdit(rule)}
-                                        className="text-green-500 hover:text-green-600 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
-                                        title="保存"
-                                      >
-                                        <Save className="w-4 h-4 mx-auto" />
-                                      </button>
-                                      <button
-                                        onClick={() => setEditingId(null)}
-                                        className="text-slate-400 hover:text-slate-600 text-xs px-2"
-                                      >
-                                        取消
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center justify-center gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                                      <button
-                                        onClick={() => {
-                                          setEditingId(rule.id);
-                                          setEditPrice(rule.unitPrice.toString());
-                                          setEditQuantity(rule.quantity.toString());
-                                          setEditSize(rule.size);
-                                        }}
-                                        className="text-slate-400 hover:text-blue-500 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
-                                        title="编辑此阶梯"
-                                      >
-                                        <Edit2 className="w-4 h-4 mx-auto" />
-                                      </button>
+                                  
+                                  {/* 删除按钮 */}
+                                  <div className={`flex items-center justify-center ${editingProduct === viewProduct ? 'opacity-100' : 'opacity-0 group-hover/row:opacity-100'} transition-opacity`}>
                                       <button
                                         onClick={() => handleDelete(rule.id)}
                                         className="text-slate-400 hover:text-red-500 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
                                         title="删除此阶梯"
                                       >
-                                        <Trash2 className="w-4 h-4 mx-auto" />
+                                        <Trash2 className="w-4 h-4" />
                                       </button>
-                                    </div>
-                                  )}
+                                  </div>
                                 </div>
                               </div>
                             ))}

@@ -19,7 +19,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     const params = await props.params;
     const { id } = params;
     const body = await req.json();
-    const { unitPrice, quantity, size } = body;
+    const { unitPrice, quantity, size, material } = body;
     
     if (!unitPrice || !quantity) {
       return NextResponse.json({ success: false, error: "缺少必填参数" }, { status: 400 });
@@ -29,6 +29,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
       where: { id },
       data: {
         ...(size && { size }),
+        ...(material && { material }),
         quantity: parseInt(quantity),
         unitPrice: parseFloat(unitPrice),
         totalPrice: parseFloat(unitPrice) * parseInt(quantity),

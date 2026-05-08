@@ -75,12 +75,7 @@ export default function QuotePage() {
                    </div>
                    <div>
                      <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.qty}</label>
-                     <select name="quantity" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors appearance-none">
-                        <option>{tq.opt1}</option>
-                        <option>{tq.opt2}</option>
-                        <option>{tq.opt3}</option>
-                        <option>{tq.opt4}</option>
-                     </select>
+                     <input required min="1" type="number" name="quantity" className="w-full bg-transparent border-b-[1.5px] border-[#101828]/20 py-3 font-medium focus:outline-none focus:border-[#101828] transition-colors" placeholder="e.g., 5000" />
                    </div>
                 </div>
              </div>
