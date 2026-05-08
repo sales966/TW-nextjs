@@ -90,10 +90,6 @@ export function HomePricing() {
                   unoptimized
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[16px] pointer-events-none"></div>
-                {/* 质感编号小标签 */}
-                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#101828] text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm border border-white/20">
-                  0{idx + 1}
-                </div>
               </div>
             </div>
             
