@@ -491,17 +491,18 @@ export default function PricingRulesPage() {
                           </span>
                         </div>
                         
-                        <div className="p-4">
-                          <div className="grid grid-cols-3 text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100 mb-2 px-2">
+                        <div className="p-4 bg-white rounded-b-2xl">
+                          <div className="grid grid-cols-[1.5fr_1fr_1fr_60px] text-xs font-bold text-slate-500 uppercase tracking-wider pb-3 border-b border-slate-200 mb-3 px-4">
                             <div>订购数量 {editingProduct === viewProduct && "(及尺寸)"}</div>
                             <div className="text-right">预估单价</div>
                             <div className="text-right">预估总价</div>
+                            <div></div>
                           </div>
                           
-                          <div className="space-y-1">
+                          <div className="space-y-1.5">
                             {group.map((rule: any) => (
-                              <div key={rule.id} className="grid grid-cols-3 items-center py-2 px-2 rounded-lg hover:bg-slate-50 transition-colors group/row">
-                                <div className="font-bold text-slate-900 text-sm">
+                              <div key={rule.id} className="grid grid-cols-[1.5fr_1fr_1fr_60px] items-center py-3 px-4 rounded-xl hover:bg-blue-50/60 transition-colors group/row border border-transparent hover:border-blue-100">
+                                <div className="font-bold text-slate-800 text-sm flex items-center">
                                   {editingProduct === viewProduct ? (
                                     <div className="flex flex-col gap-2 w-full pr-4">
                                       <input
@@ -513,10 +514,10 @@ export default function PricingRulesPage() {
                                           if(target) target.size = e.target.value;
                                           setEditedRules(newRules);
                                         }}
-                                        className="w-full px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                        className="w-full px-3 py-2 text-xs border border-blue-200 focus:border-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 bg-white transition-all shadow-sm"
                                         placeholder="修改尺寸"
                                       />
-                                      <div className="flex items-center gap-1.5">
+                                      <div className="flex items-center gap-2">
                                         <input
                                           type="number"
                                           value={rule.quantity}
@@ -526,20 +527,20 @@ export default function PricingRulesPage() {
                                             if(target) target.quantity = Number(e.target.value);
                                             setEditedRules(newRules);
                                           }}
-                                          className="w-20 px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                          className="w-24 px-3 py-2 text-xs border border-blue-200 focus:border-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 bg-white transition-all shadow-sm"
                                           placeholder="数量"
                                         />
-                                        <span className="text-xs text-slate-500 font-medium">个</span>
+                                        <span className="text-xs text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded">个</span>
                                       </div>
                                     </div>
                                   ) : (
-                                    `${rule.quantity.toLocaleString()} 个`
+                                    <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm border border-slate-200 shadow-sm">{rule.quantity.toLocaleString()} 个</span>
                                   )}
                                 </div>
-                                <div className="text-right font-bold text-blue-600 text-sm">
+                                <div className="text-right font-black text-blue-600 text-[15px]">
                                   {editingProduct === viewProduct ? (
-                                    <div className="flex justify-end">
-                                      <span className="text-slate-400 mr-1.5 pt-1.5">$</span>
+                                    <div className="flex justify-end items-center">
+                                      <span className="text-slate-400 mr-2 font-bold">$</span>
                                       <input
                                         type="number"
                                         step="0.001"
@@ -550,25 +551,26 @@ export default function PricingRulesPage() {
                                           if(target) target.unitPrice = Number(e.target.value);
                                           setEditedRules(newRules);
                                         }}
-                                        className="w-24 px-2 py-1.5 text-right border border-blue-200 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                        className="w-28 px-3 py-2 text-right border border-blue-200 focus:border-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 bg-white transition-all shadow-sm text-sm"
                                       />
                                     </div>
                                   ) : (
                                     `$${rule.unitPrice.toFixed(3)}`
                                   )}
                                 </div>
-                                <div className="text-right font-medium text-slate-700 text-sm flex justify-end items-center gap-4">
+                                <div className="text-right font-black text-slate-800 text-[15px]">
                                   {editingProduct === viewProduct ? (
-                                    <span className="text-slate-400">自动计算</span>
+                                    <span className="text-slate-400 font-medium text-sm bg-slate-50 px-3 py-1.5 rounded-md border border-slate-100">自动计算</span>
                                   ) : (
                                     `$${rule.totalPrice.toFixed(2)}`
                                   )}
-                                  
+                                </div>
+                                <div className="flex justify-end">
                                   {/* 删除按钮 */}
                                   <div className={`flex items-center justify-center ${editingProduct === viewProduct ? 'opacity-100' : 'opacity-0 group-hover/row:opacity-100'} transition-opacity`}>
                                       <button
                                         onClick={() => handleDelete(rule.id)}
-                                        className="text-slate-400 hover:text-red-500 bg-white shadow-sm border border-slate-100 p-1.5 rounded-md"
+                                        className="text-slate-400 hover:text-red-600 hover:bg-red-50 bg-white shadow-sm border border-slate-200 p-2 rounded-lg transition-all"
                                         title="删除此阶梯"
                                       >
                                         <Trash2 className="w-4 h-4" />
