@@ -66,32 +66,38 @@ export function HomePricing() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col gap-10">
+      {/* 统一的大容器，消除割裂感 */}
+      <div className="bg-white rounded-[24px] border border-[#101828]/5 shadow-[0_8px_30px_rgba(16,24,40,0.03)] overflow-hidden">
         {products.map((product: any, idx: number) => (
-          <div key={idx} className="bg-white rounded-3xl border border-[#101828]/5 p-8 lg:p-10 shadow-[0_4px_24px_rgba(16,24,40,0.02)] hover:shadow-[0_12px_40px_rgba(16,24,40,0.05)] transition-shadow duration-300">
-            {/* 商品主标题 */}
-            <h3 className="font-bold text-[#101828] text-[24px] tracking-tight mb-8 pb-5 border-b border-[#101828]/5 flex items-center">
-              <span className="w-2 h-6 bg-blue-600 rounded-full mr-4 inline-block"></span>
-              {product.material}
-            </h3>
+          <div key={idx} className="border-b border-[#101828]/5 last:border-0 p-8 md:p-12 hover:bg-[#FAFAFA]/50 transition-colors duration-500">
+            {/* 商品主标题：不再是独立的卡片，而是作为区块的 Header */}
+            <div className="flex items-center mb-8">
+              <div className="w-1.5 h-6 bg-[#101828] rounded-full mr-4"></div>
+              <h3 className="font-bold text-[#101828] text-[22px] md:text-[26px] tracking-tight">
+                {product.material}
+              </h3>
+            </div>
             
-            {/* 不同尺寸的网格 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* 不同尺寸的极简网格排版 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-12">
               {product.sizesList.map((sz: any, i: number) => (
-                <div key={i} className="bg-[#FBFAF7] rounded-2xl p-6 border border-[#101828]/[0.03]">
-                  <div className="inline-flex items-center px-3 py-1.5 rounded-md bg-white border border-[#101828]/5 text-blue-700 text-[13px] font-bold tracking-widest uppercase mb-5 shadow-sm">
+                <div key={i} className="flex flex-col">
+                  {/* 尺寸标签，干净利落的下划线样式 */}
+                  <div className="text-[13px] font-bold text-blue-700 uppercase tracking-widest mb-4 pb-3 border-b border-blue-700/10 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                     {sz.name}
                   </div>
                   
+                  {/* 价格列表 */}
                   <div className="space-y-1">
-                    <div className="flex justify-between text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest border-b border-[#101828]/5 pb-3 mb-2">
-                      <span>{lang === 'zh' ? '起订量 (个)' : lang === 'tw' ? '起訂量 (個)' : 'QTY'}</span>
-                      <span>{lang === 'zh' ? '出厂单价' : lang === 'tw' ? '出廠單價' : 'Price'}</span>
+                    <div className="flex justify-between text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest pb-2">
+                      <span>{lang === 'zh' ? '起订量' : lang === 'tw' ? '起訂量' : 'QTY'}</span>
+                      <span>{lang === 'zh' ? '单价' : lang === 'tw' ? '單價' : 'Price'}</span>
                     </div>
                     {sz.tiers.map((tier: any, j: number) => (
-                      <div key={j} className="flex justify-between items-center py-2 border-b border-[#101828]/5 last:border-0 group">
-                        <span className="font-bold text-[#101828] text-[15px]">{tier.quantity.toLocaleString()}</span>
-                        <span className="font-black text-[#667085] group-hover:text-blue-600 transition-colors text-[16px]">
+                      <div key={j} className="flex justify-between items-center py-2.5 group border-b border-[#101828]/[0.03] last:border-0">
+                        <span className="font-semibold text-[#101828] text-[15px]">{tier.quantity.toLocaleString()}</span>
+                        <span className="font-black text-[#667085] group-hover:text-[#101828] transition-colors text-[16px]">
                           ${tier.unitPrice.toFixed(3)}
                         </span>
                       </div>
@@ -104,11 +110,12 @@ export function HomePricing() {
         ))}
       </div>
       
-      <div className="mt-16 text-center">
-        <Link href="/pricing" className="inline-flex items-center justify-center px-8 py-4 bg-white border border-[#101828]/10 hover:border-[#101828] text-[#101828] font-bold uppercase tracking-widest text-[13px] rounded-lg shadow-sm hover:shadow-md transition-all">
-          <Calculator className="w-4 h-4 mr-2" />
-          {lang === 'zh' ? '计算国际运费与到门总价' : lang === 'tw' ? '計算國際運費與到門總價' : 'Calculate DDP Shipping & Total Cost'}
-          <ArrowRight className="w-4 h-4 ml-2" />
+      {/* 底部按钮 */}
+      <div className="mt-12 flex justify-center">
+        <Link href="/pricing" className="inline-flex items-center justify-center px-10 py-4 bg-[#101828] text-white font-bold uppercase tracking-widest text-[13px] rounded-lg shadow-[0_10px_30px_rgba(16,24,40,0.15)] hover:-translate-y-1 transition-all duration-300">
+          <Calculator className="w-4 h-4 mr-3 opacity-70" />
+          {lang === 'zh' ? '使用完整估价器 (含运费及多货币)' : lang === 'tw' ? '使用完整估價器 (含運費及多貨幣)' : 'Open Full Estimator'}
+          <ArrowRight className="w-4 h-4 ml-3 opacity-70" />
         </Link>
       </div>
     </div>
