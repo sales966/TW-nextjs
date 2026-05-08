@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { material, size, tiers } = body;
+    const { material, size, unitWeight, cbmPer1000, cartonSize, pcsPerCarton, tiers } = body;
 
     if (!material || !size || !tiers || !Array.isArray(tiers) || tiers.length === 0) {
       return NextResponse.json({ success: false, error: "缺少必填字段或价格阶梯为空" }, { status: 400 });
@@ -48,6 +48,10 @@ export async function POST(req: Request) {
           update: {
             unitPrice,
             totalPrice,
+            unitWeight,
+            cbmPer1000,
+            cartonSize,
+            pcsPerCarton,
           },
           create: {
             material,
@@ -55,6 +59,10 @@ export async function POST(req: Request) {
             quantity,
             unitPrice,
             totalPrice,
+            unitWeight,
+            cbmPer1000,
+            cartonSize,
+            pcsPerCarton,
           }
         });
         count++;

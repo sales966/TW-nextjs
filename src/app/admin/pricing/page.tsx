@@ -12,6 +12,10 @@ export default function PricingRulesPage() {
   const [formData, setFormData] = useState({
     material: "",
     size: "",
+    unitWeight: "",    // 单个的克重 (g)
+    cbmPer1000: "",    // 1000pcs的材积 (CBM)
+    cartonSize: "",    // 箱规 (长*宽*高)
+    pcsPerCarton: "",  // 装量 (pcs/箱)
   });
 
   // 后台看板查看状态
@@ -60,6 +64,10 @@ export default function PricingRulesPage() {
         body: JSON.stringify({
           material: formData.material,
           size: formData.size,
+          unitWeight: parseFloat(formData.unitWeight) || null,
+          cbmPer1000: parseFloat(formData.cbmPer1000) || null,
+          cartonSize: formData.cartonSize || null,
+          pcsPerCarton: parseInt(formData.pcsPerCarton) || null,
           tiers: validTiers
         }),
       });
@@ -287,6 +295,52 @@ export default function PricingRulesPage() {
                     </>
                   )}
                 </datalist>
+              </div>
+            </div>
+
+            {/* 物流装箱参数录入区 */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">单个克重 (g) <span className="text-slate-400 font-normal ml-1">选填</span></label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.unitWeight}
+                  placeholder="e.g. 50"
+                  onChange={(e) => setFormData({ ...formData, unitWeight: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none text-sm transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">1000pcs材积 (CBM) <span className="text-slate-400 font-normal ml-1">选填</span></label>
+                <input
+                  type="number"
+                  step="0.001"
+                  value={formData.cbmPer1000}
+                  placeholder="e.g. 0.05"
+                  onChange={(e) => setFormData({ ...formData, cbmPer1000: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none text-sm transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">箱规 (长*宽*高) <span className="text-slate-400 font-normal ml-1">选填</span></label>
+                <input
+                  type="text"
+                  value={formData.cartonSize}
+                  placeholder="e.g. 50*40*30cm"
+                  onChange={(e) => setFormData({ ...formData, cartonSize: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none text-sm transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">装箱量 (pcs/箱) <span className="text-slate-400 font-normal ml-1">选填</span></label>
+                <input
+                  type="number"
+                  value={formData.pcsPerCarton}
+                  placeholder="e.g. 100"
+                  onChange={(e) => setFormData({ ...formData, pcsPerCarton: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none text-sm transition-all"
+                />
               </div>
             </div>
 

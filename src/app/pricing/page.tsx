@@ -25,6 +25,7 @@ export default function PricingPage() {
       qty: "Quantity",
       unit: "Unit Price",
       total: "Total Cost",
+      shipping: "Est. Packing",
       empty: "Please select both material and dimensions to view pricing.",
       noData: "Loading pricing data...",
       ctaTitle: "Ready to start?",
@@ -40,6 +41,7 @@ export default function PricingPage() {
       qty: "起订量 (个)",
       unit: "预估单价",
       total: "预估总价",
+      shipping: "预估装箱参数",
       empty: "请在上方选择材质和尺寸，即可查看完整的阶梯报价。",
       noData: "正在加载报价资料库...",
       ctaTitle: "获取精准底价",
@@ -55,6 +57,7 @@ export default function PricingPage() {
       qty: "起訂量 (個)",
       unit: "預估單價",
       total: "預估總價",
+      shipping: "預估裝箱參數",
       empty: "請在上方選擇材質和尺寸，即可查看完整的階梯報價。",
       noData: "正在加載報價資料庫...",
       ctaTitle: "獲取精準底價",
@@ -204,15 +207,16 @@ export default function PricingPage() {
 
                 {currentTiers.length > 0 ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-3 text-[12px] font-bold text-[#667085] uppercase tracking-wider pb-2 border-b border-[#101828]/5">
+                    <div className="grid grid-cols-4 text-[12px] font-bold text-[#667085] uppercase tracking-wider pb-2 border-b border-[#101828]/5">
                       <div>{t.qty}</div>
                       <div className="text-right">{t.unit}</div>
                       <div className="text-right">{t.total}</div>
+                      <div className="text-right">{t.shipping}</div>
                     </div>
                     
                     <div className="flex flex-col gap-3 pt-2">
                       {currentTiers.map((tier, idx) => (
-                        <div key={idx} className="grid grid-cols-3 items-center p-4 rounded-xl bg-[#F9F9F8] border border-[#101828]/5 hover:bg-[#F0F0EE] transition-colors">
+                        <div key={idx} className="grid grid-cols-4 items-center p-4 rounded-xl bg-[#F9F9F8] border border-[#101828]/5 hover:bg-[#F0F0EE] transition-colors">
                           <div className="font-bold text-[#101828] text-[15px]">
                             {tier.quantity.toLocaleString()}
                           </div>
@@ -221,6 +225,12 @@ export default function PricingPage() {
                           </div>
                           <div className="text-right font-bold text-[#101828] text-[17px]">
                             ${tier.totalPrice.toFixed(2)}
+                          </div>
+                          <div className="text-right text-[12px] text-[#667085] leading-snug flex flex-col items-end justify-center">
+                            {tier.unitWeight && <div>{((tier.unitWeight * tier.quantity) / 1000).toFixed(1)} KG</div>}
+                            {tier.cbmPer1000 && <div>{((tier.cbmPer1000 * tier.quantity) / 1000).toFixed(2)} CBM</div>}
+                            {tier.pcsPerCarton && <div>{Math.ceil(tier.quantity / tier.pcsPerCarton)} 箱 {tier.cartonSize && `(${tier.cartonSize})`}</div>}
+                            {!tier.unitWeight && !tier.cbmPer1000 && !tier.pcsPerCarton && <span className="opacity-40">-</span>}
                           </div>
                         </div>
                       ))}

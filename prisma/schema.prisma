@@ -169,6 +169,12 @@ model PricingRule {
   unitPrice   Float    // e.g. 0.50
   totalPrice  Float    // e.g. 250.00
   
+  // Logistics Info
+  unitWeight   Float?   // 单个的克重 (g)
+  cbmPer1000   Float?   // 1000pcs 的材积 (CBM)
+  cartonSize   String?  // 箱规 (e.g. "50*40*30cm")
+  pcsPerCarton Int?     // 装量 (pcs/ctn)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
