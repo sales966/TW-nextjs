@@ -208,8 +208,8 @@ export default function Home() {
 
       {/* 5. Pricing Matrix */}
       <section className="py-40 bg-[#FBFAF7]">
-        <ScrollReveal className="max-w-[1200px] mx-auto px-6 lg:px-12">
-          <RevealText className="flex justify-between items-end mb-16">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
+          <div className="flex justify-between items-end mb-16">
             <div>
               <h2 className="text-[36px] md:text-[48px] font-bold text-[#101828] tracking-tight mb-4">
                 {lang === 'zh' ? '出厂报价矩阵' : lang === 'tw' ? '出廠報價矩陣' : 'Wholesale Matrix'}
@@ -218,11 +218,9 @@ export default function Home() {
                 {lang === 'zh' ? '透明的阶梯出厂价，帮助您快速评估基础预算。' : lang === 'tw' ? '透明的階梯出廠價，幫助您快速評估基礎預算。' : 'Transparent tiered wholesale pricing. Calculate exact global shipping & taxes in our full estimator.'}
               </p>
             </div>
-          </RevealText>
-          <RevealText delay={0.2}>
-            <HomePricing />
-          </RevealText>
-        </ScrollReveal>
+          </div>
+          <HomePricing />
+        </div>
       </section>
 
       {/* 6. Craft */}
