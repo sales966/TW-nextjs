@@ -6,13 +6,21 @@ import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import Image from "next/image";
 
-const getMaterialImage = (materialName: string | null) => {
-  if (!materialName) return '/images/pricing/bag_plain.png';
-  if (materialName.includes('普通纸')) return '/images/pricing/bag_plain.png';
-  if (materialName.includes('牛皮')) return '/images/pricing/bag_kraft.png';
-  if (materialName.includes('铜版纸')) return '/images/pricing/bag_coated.png';
-  if (materialName.includes('黑卡')) return '/images/pricing/bag_black.png';
-  return '/images/pricing/bag_plain.png';
+const getSizeImage = (materialName: string | null, sizeName: string | null) => {
+  if (!materialName) return '/images/pricing/plain_small.png';
+  
+  let materialKey = 'plain';
+  if (materialName.includes('牛皮')) materialKey = 'kraft';
+  if (materialName.includes('铜版纸')) materialKey = 'coated';
+  if (materialName.includes('黑卡')) materialKey = 'black';
+
+  let sizeKey = 'small'; // 默认对应单杯装等细长尺寸
+  if (sizeName) {
+    if (sizeName.toLowerCase().includes('21cm')) sizeKey = 'medium'; // 对应中号方正尺寸
+    if (sizeName.toLowerCase().includes('28cm')) sizeKey = 'large'; // 对应大号宽版尺寸
+  }
+
+  return `/images/pricing/${materialKey}_${sizeKey}.png`;
 };
 
 export default function PricingPage() {
@@ -243,11 +251,11 @@ export default function PricingPage() {
               {/* Left Side: Selectors */}
               <div className="lg:col-span-5 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-[#101828]/5 bg-[#FAFAFA]">
                 
-                {/* 动态商品预览图 */}
+                {/* 动态商品预览图（随材质与尺寸实时切换） */}
                 <div className="mb-10 relative w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden shadow-sm border border-[#101828]/5 bg-white group">
                   <Image 
-                    src={getMaterialImage(selectedMaterial)} 
-                    alt={selectedMaterial || "Product Showcase"}
+                    src={getSizeImage(selectedMaterial, selectedSize)} 
+                    alt={`${selectedMaterial} - ${selectedSize}` || "Product Showcase"}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     unoptimized
