@@ -25,26 +25,31 @@ export function HomePricing() {
       });
   }, []);
 
-  const productCards = useMemo(() => {
+  const products = useMemo(() => {
     if (!rules || rules.length === 0) return [];
     
-    // 根据材质和尺寸进行分组
+    // 按材质进行主分组
     const grouped = rules.reduce((acc, rule) => {
-      const key = `${rule.material}__${rule.size}`;
-      if (!acc[key]) {
-        acc[key] = {
+      if (!acc[rule.material]) {
+        acc[rule.material] = {
           material: rule.material,
-          size: rule.size,
-          tiers: []
+          sizes: {}
         };
       }
-      acc[key].tiers.push(rule);
+      if (!acc[rule.material].sizes[rule.size]) {
+        acc[rule.material].sizes[rule.size] = [];
+      }
+      acc[rule.material].sizes[rule.size].push(rule);
       return acc;
     }, {});
 
-    // 转换为数组并对阶梯进行排序
+    // 将尺寸对象转换为数组，并对阶梯进行排序
     return Object.values(grouped).map((p: any) => {
-      p.tiers.sort((a: any, b: any) => a.quantity - b.quantity);
+      p.sizesList = Object.keys(p.sizes).map(sizeName => {
+        const tiers = p.sizes[sizeName];
+        tiers.sort((a: any, b: any) => a.quantity - b.quantity);
+        return { name: sizeName, tiers };
+      });
       return p;
     });
   }, [rules]);
@@ -57,33 +62,41 @@ export function HomePricing() {
     );
   }
 
-  if (productCards.length === 0) return null;
+  if (products.length === 0) return null;
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {productCards.map((product: any, idx: number) => (
-          <div key={idx} className="bg-white rounded-3xl border border-[#101828]/5 p-8 shadow-[0_4px_24px_rgba(16,24,40,0.02)] hover:shadow-[0_12px_40px_rgba(16,24,40,0.06)] hover:-translate-y-1 transition-all duration-300">
-            <div className="mb-8">
-              <h3 className="font-bold text-[#101828] text-[20px] tracking-tight leading-tight mb-3">
-                {product.material}
-              </h3>
-              <div className="inline-flex items-center px-3 py-1.5 rounded-md bg-[#F4F8FD] text-blue-700 text-[12px] font-bold tracking-widest uppercase">
-                {product.size}
-              </div>
-            </div>
+      <div className="flex flex-col gap-10">
+        {products.map((product: any, idx: number) => (
+          <div key={idx} className="bg-white rounded-3xl border border-[#101828]/5 p-8 lg:p-10 shadow-[0_4px_24px_rgba(16,24,40,0.02)] hover:shadow-[0_12px_40px_rgba(16,24,40,0.05)] transition-shadow duration-300">
+            {/* 商品主标题 */}
+            <h3 className="font-bold text-[#101828] text-[24px] tracking-tight mb-8 pb-5 border-b border-[#101828]/5 flex items-center">
+              <span className="w-2 h-6 bg-blue-600 rounded-full mr-4 inline-block"></span>
+              {product.material}
+            </h3>
             
-            <div className="space-y-1">
-              <div className="flex justify-between text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest border-b border-[#101828]/5 pb-3 mb-3">
-                <span>{lang === 'zh' ? '起订量 (个)' : lang === 'tw' ? '起訂量 (個)' : 'QTY'}</span>
-                <span>{lang === 'zh' ? '出厂单价' : lang === 'tw' ? '出廠單價' : 'Unit Price (EXW)'}</span>
-              </div>
-              {product.tiers.map((tier: any, i: number) => (
-                <div key={i} className="flex justify-between items-center py-2.5 border-b border-[#101828]/5 last:border-0 group">
-                  <span className="font-bold text-[#101828] text-[15px]">{tier.quantity.toLocaleString()}</span>
-                  <span className="font-black text-[#667085] group-hover:text-blue-600 transition-colors text-[16px]">
-                    ${tier.unitPrice.toFixed(3)}
-                  </span>
+            {/* 不同尺寸的网格 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {product.sizesList.map((sz: any, i: number) => (
+                <div key={i} className="bg-[#FBFAF7] rounded-2xl p-6 border border-[#101828]/[0.03]">
+                  <div className="inline-flex items-center px-3 py-1.5 rounded-md bg-white border border-[#101828]/5 text-blue-700 text-[13px] font-bold tracking-widest uppercase mb-5 shadow-sm">
+                    {sz.name}
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest border-b border-[#101828]/5 pb-3 mb-2">
+                      <span>{lang === 'zh' ? '起订量 (个)' : lang === 'tw' ? '起訂量 (個)' : 'QTY'}</span>
+                      <span>{lang === 'zh' ? '出厂单价' : lang === 'tw' ? '出廠單價' : 'Price'}</span>
+                    </div>
+                    {sz.tiers.map((tier: any, j: number) => (
+                      <div key={j} className="flex justify-between items-center py-2 border-b border-[#101828]/5 last:border-0 group">
+                        <span className="font-bold text-[#101828] text-[15px]">{tier.quantity.toLocaleString()}</span>
+                        <span className="font-black text-[#667085] group-hover:text-blue-600 transition-colors text-[16px]">
+                          ${tier.unitPrice.toFixed(3)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
