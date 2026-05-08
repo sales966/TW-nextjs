@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose'
 const secretKey = process.env.SESSION_SECRET || 'fallback-secret-key-for-development'
 const encodedKey = new TextEncoder().encode(secretKey)
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname
 
   // Check if it's an admin path
