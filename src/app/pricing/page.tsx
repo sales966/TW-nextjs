@@ -302,7 +302,7 @@ export default function PricingPage() {
                 </div>
 
                 {/* 目的国选择 */}
-                <div className="mt-10 pt-10 border-t border-[#101828]/5">
+                <div className="mt-10">
                   <h3 className="text-[13px] font-bold text-[#101828] uppercase tracking-widest mb-4">
                     {t.destLabel}
                   </h3>
