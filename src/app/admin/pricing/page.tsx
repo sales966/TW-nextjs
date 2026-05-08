@@ -540,18 +540,29 @@ export default function PricingRulesPage() {
                   <div className="space-y-6">
                     {Object.entries(groupedSizes).map(([size, group]: [string, any]) => (
                       <div key={size} className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                        <div className="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
-                          <div className="flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 mr-3"></span>
-                            {editingProduct === viewProduct ? (
-                                <span className="font-bold text-slate-800 text-sm">尺寸分组：{size} (编辑模式下修改下方尺寸即可)</span>
-                            ) : (
-                                <span className="font-bold text-slate-800 text-sm">{size}</span>
-                            )}
+                        <div className="bg-slate-50 px-5 py-3 border-b border-slate-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <span className="w-2 h-2 rounded-full bg-blue-500 mr-3"></span>
+                              {editingProduct === viewProduct ? (
+                                  <span className="font-bold text-slate-800 text-sm">尺寸分组：{size} (编辑模式下修改下方尺寸即可)</span>
+                              ) : (
+                                  <span className="font-bold text-slate-800 text-sm">{size}</span>
+                              )}
+                            </div>
+                            <span className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200">
+                              {group.length} 个阶梯
+                            </span>
                           </div>
-                          <span className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200">
-                            {group.length} 个阶梯
-                          </span>
+                          
+                          {(!editingProduct || editingProduct !== viewProduct) && (group[0]?.unitWeight || group[0]?.cbmPer1000 || group[0]?.cartonSize || group[0]?.pcsPerCarton) && (
+                            <div className="flex flex-wrap gap-4 mt-2 ml-5 text-[11px] text-slate-500">
+                              {group[0].unitWeight && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">单重:</span><span className="font-bold text-slate-700">{group[0].unitWeight}g</span></div>}
+                              {group[0].cbmPer1000 && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">千个材积:</span><span className="font-bold text-slate-700">{group[0].cbmPer1000}</span></div>}
+                              {group[0].cartonSize && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">箱规:</span><span className="font-bold text-slate-700">{group[0].cartonSize}</span></div>}
+                              {group[0].pcsPerCarton && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">装量:</span><span className="font-bold text-slate-700">{group[0].pcsPerCarton}pcs/箱</span></div>}
+                            </div>
+                          )}
                         </div>
                         
                         <div className="p-4 bg-white rounded-b-2xl">
