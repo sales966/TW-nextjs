@@ -67,6 +67,8 @@ export default function PricingRulesPage() {
       if (data.success) {
         // 重置单价输入，但保留数量阶梯方便下次录入
         setTiers(tiers.map(t => ({ ...t, unitPrice: "" })));
+        // 自动将下方总览的视角切换到刚才录入的商品
+        setViewProduct(formData.material);
         fetchRules();
       } else {
         alert(data.error || "添加失败");
