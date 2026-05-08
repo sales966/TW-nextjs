@@ -89,6 +89,34 @@ export default function QuotePage() {
                   <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{tq.msg}</label>
                   <textarea name="message" rows={5} className="w-full bg-[#F6F4EF] rounded border border-[#101828]/10 p-6 font-medium focus:outline-none focus:border-[#101828] transition-colors resize-none placeholder:text-[#667085]/60" placeholder={tq.ph}></textarea>
                 </div>
+                <div>
+                  <label className="block text-sm font-bold tracking-[0.05em] text-[#101828]/60 uppercase mb-3">{(tq as any).uploadTitle}</label>
+                  <div className="w-full bg-[#F6F4EF] rounded border border-dashed border-[#101828]/20 p-8 text-center transition-colors hover:border-[#101828]/50">
+                    <input 
+                      type="file" 
+                      name="attachment" 
+                      id="attachment-upload"
+                      className="hidden" 
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.ai,.psd,.zip,.rar"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && file.size > 100 * 1024 * 1024) {
+                          alert((tq as any).uploadErr);
+                          e.target.value = ""; // Clear input
+                        } else if (file) {
+                          // just display file name
+                          const label = document.getElementById("upload-label-text");
+                          if (label) label.innerText = file.name;
+                        }
+                      }}
+                    />
+                    <label htmlFor="attachment-upload" className="cursor-pointer flex flex-col items-center justify-center">
+                      <svg className="w-8 h-8 text-[#101828]/40 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                      <span id="upload-label-text" className="text-sm font-bold text-[#101828] underline underline-offset-4 decoration-[#101828]/30 hover:decoration-[#101828]">{(tq as any).uploadTitle}</span>
+                      <span className="text-xs text-[#101828]/50 mt-2">{(tq as any).uploadDesc}</span>
+                    </label>
+                  </div>
+                </div>
              </div>
 
              {/* Section 3 */}
