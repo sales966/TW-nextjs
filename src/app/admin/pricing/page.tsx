@@ -160,9 +160,9 @@ export default function PricingRulesPage() {
     }
   };
 
-  // 提取唯一的商品名与尺寸 (用于看板左侧及输入补全)
-  const uniqueProducts = Array.from(new Set(rules.map((r: any) => r.material)));
-  const uniqueSizes = Array.from(new Set(rules.map((r: any) => r.size)));
+  // 提取唯一的商品名与尺寸 (合并默认项与数据库已有项)
+  const uniqueProducts = Array.from(new Set(["牛皮单色250克", "铜版纸4色250克", "黑卡单色250克", "普通纸单印120克", ...rules.map((r: any) => r.material)]));
+  const uniqueSizes = Array.from(new Set(["12.8cm*9.5cm*22cm", "21cm*14cm*19cm", "28cm*15cm*28cm", ...rules.map((r: any) => r.size)]));
   const filteredProducts = uniqueProducts.filter((p: any) => p.toLowerCase().includes(searchTerm.toLowerCase()));
 
   // 默认选中第一个商品
