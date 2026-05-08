@@ -88,24 +88,24 @@ export function HomePricing() {
     <div className="flex flex-col w-full">
       
       {/* 2x2 Grid 精致排版 */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 md:gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5">
         {products.map((product: any, idx: number) => (
-          <div key={idx} className="bg-white rounded-[24px] border border-[#101828]/5 shadow-[0_4px_20px_rgba(16,24,40,0.02)] p-6 md:p-8 flex flex-col hover:shadow-[0_12px_40px_rgba(16,24,40,0.06)] hover:-translate-y-1 transition-all duration-500">
+          <div key={idx} className="bg-white rounded-[20px] border border-[#101828]/5 shadow-[0_4px_20px_rgba(16,24,40,0.02)] p-4 md:p-5 flex flex-col hover:shadow-[0_12px_40px_rgba(16,24,40,0.06)] hover:-translate-y-1 transition-all duration-500">
             
             {/* 左上角：商品名称 */}
-            <div className="mb-6 pb-4 border-b border-[#101828]/5 flex justify-between items-center">
-              <h3 className="text-[20px] md:text-[22px] font-black text-[#101828] tracking-tight leading-none">
+            <div className="mb-4 pb-3 border-b border-[#101828]/5 flex justify-between items-center">
+              <h3 className="text-[16px] md:text-[18px] font-black text-[#101828] tracking-tight leading-none">
                 {product.material}
               </h3>
             </div>
             
             {/* 尺寸列表（每行左侧是尺寸配图，右侧是阶梯价） */}
-            <div className="space-y-6 flex-grow">
+            <div className="space-y-4 flex-grow">
               {product.sizesList.map((sz: any, i: number) => (
-                <div key={i} className="flex flex-row gap-5 md:gap-6 items-start">
+                <div key={i} className="flex flex-row gap-3 md:gap-4 items-start">
                   
                   {/* 左侧：专属尺寸比例图 */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 relative rounded-[14px] border border-[#101828]/5 overflow-hidden bg-[#FAFAFA] group mt-1">
+                  <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 relative rounded-[10px] border border-[#101828]/5 overflow-hidden bg-[#FAFAFA] group mt-0.5">
                     <Image 
                       src={getSizeImage(product.material, sz.name)} 
                       fill 
@@ -113,23 +113,23 @@ export function HomePricing() {
                       alt={sz.name} 
                       unoptimized 
                     />
-                    <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[14px] pointer-events-none"></div>
+                    <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[10px] pointer-events-none"></div>
                   </div>
                   
                   {/* 右侧：尺寸标题与阶梯价表 */}
                   <div className="flex-1 flex flex-col justify-start">
                     
                     {/* 尺寸名称 */}
-                    <div className="flex items-center text-[10px] md:text-[11px] font-bold text-[#101828]/60 uppercase tracking-widest mb-2 pl-0.5">
+                    <div className="flex items-center text-[9px] md:text-[10px] font-bold text-[#101828]/60 uppercase tracking-widest mb-1.5 pl-0.5">
                       {sz.name}
                     </div>
                     
                     {/* 阶梯价细目 */}
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-0.5">
                       {sz.tiers.map((tier: any, j: number) => (
-                        <div key={j} className="flex justify-between items-center text-[13px] bg-[#FAFAFA]/70 px-3 py-1.5 rounded-lg hover:bg-[#F4F8FD] transition-colors group cursor-default">
+                        <div key={j} className="flex justify-between items-center text-[11px] bg-[#FAFAFA]/70 px-2 py-1 rounded-md hover:bg-[#F4F8FD] transition-colors group cursor-default">
                           <span className="font-semibold text-[#667085] group-hover:text-blue-700 transition-colors">
-                            {tier.quantity.toLocaleString()} <span className="text-[10px] font-normal opacity-60 ml-0.5">pcs</span>
+                            {tier.quantity.toLocaleString()} <span className="text-[9px] font-normal opacity-60 ml-0.5">pcs</span>
                           </span>
                           <span className="font-black text-[#101828] group-hover:text-blue-700 transition-colors">
                             ${tier.unitPrice.toFixed(3)}
