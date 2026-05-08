@@ -151,7 +151,11 @@ export default function PricingRulesPage() {
             material: editedProductName,
             unitPrice: rule.unitPrice.toString(), 
             quantity: rule.quantity.toString(),
-            size: rule.size 
+            size: rule.size,
+            unitWeight: rule.unitWeight,
+            cbmPer1000: rule.cbmPer1000,
+            cartonSize: rule.cartonSize,
+            pcsPerCarton: rule.pcsPerCarton
           }),
         })
       ));
@@ -561,6 +565,61 @@ export default function PricingRulesPage() {
                               {group[0].cbmPer1000 && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">千个材积:</span><span className="font-bold text-slate-700">{group[0].cbmPer1000}</span></div>}
                               {group[0].cartonSize && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">箱规:</span><span className="font-bold text-slate-700">{group[0].cartonSize}</span></div>}
                               {group[0].pcsPerCarton && <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm"><span className="text-slate-400 mr-1">装量:</span><span className="font-bold text-slate-700">{group[0].pcsPerCarton}pcs/箱</span></div>}
+                            </div>
+                          )}
+                          
+                          {editingProduct === viewProduct && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 pt-3 border-t border-slate-200">
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1">修改单重 (g)</label>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={group[0].unitWeight ?? ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value ? parseFloat(e.target.value) : null;
+                                    setEditedRules(editedRules.map(r => r.size === size ? { ...r, unitWeight: val } : r));
+                                  }}
+                                  className="w-full px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-600 rounded bg-white shadow-sm outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1">修改 1000pcs材积</label>
+                                <input
+                                  type="number"
+                                  step="0.001"
+                                  value={group[0].cbmPer1000 ?? ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value ? parseFloat(e.target.value) : null;
+                                    setEditedRules(editedRules.map(r => r.size === size ? { ...r, cbmPer1000: val } : r));
+                                  }}
+                                  className="w-full px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-600 rounded bg-white shadow-sm outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1">修改箱规</label>
+                                <input
+                                  type="text"
+                                  value={group[0].cartonSize ?? ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value || null;
+                                    setEditedRules(editedRules.map(r => r.size === size ? { ...r, cartonSize: val } : r));
+                                  }}
+                                  className="w-full px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-600 rounded bg-white shadow-sm outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1">修改装量 (pcs/箱)</label>
+                                <input
+                                  type="number"
+                                  value={group[0].pcsPerCarton ?? ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value ? parseInt(e.target.value) : null;
+                                    setEditedRules(editedRules.map(r => r.size === size ? { ...r, pcsPerCarton: val } : r));
+                                  }}
+                                  className="w-full px-2 py-1.5 text-xs border border-blue-200 focus:border-blue-600 rounded bg-white shadow-sm outline-none"
+                                />
+                              </div>
                             </div>
                           )}
                         </div>
