@@ -181,3 +181,19 @@ model PricingRule {
   @@unique([material, size, quantity])
   @@index([material])
 }
+
+model ShippingRate {
+  id              String   @id @default(cuid())
+  country         String   // e.g. "USA", "UK", "Australia"
+  method          String   // e.g. "Sea Freight DDP", "Air Express"
+  pricePerKg      Float?   // 按公斤计费时的单价 (USD)
+  pricePerCbm     Float?   // 按体积计费时的单价 (USD)
+  volumetricRatio Int      @default(6000) // 抛重除数，如 6000 (1CBM = 167KG), 5000 (1CBM = 200KG)
+  estimatedDays   String?  // e.g. "25-30 Days"
+  isActive        Boolean  @default(true) // 是否启用
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([country, method])
+}

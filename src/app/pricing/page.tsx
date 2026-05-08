@@ -13,6 +13,11 @@ export default function PricingPage() {
   // 状态
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  
+  // 运费相关
+  const [shippingRates, setShippingRates] = useState<any[]>([]);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
 
   // 文本多语言
   const text = {
@@ -26,6 +31,9 @@ export default function PricingPage() {
       unit: "Unit Price",
       total: "Total Cost",
       shipping: "Est. Packing",
+      destLabel: "3. Select Destination (Optional)",
+      shippingTotal: "Est. DDP Total",
+      shippingUnit: "Est. Landed Unit",
       empty: "Please select both material and dimensions to view pricing.",
       noData: "Loading pricing data...",
       ctaTitle: "Ready to start?",
@@ -42,6 +50,9 @@ export default function PricingPage() {
       unit: "预估单价",
       total: "预估总价",
       shipping: "预估装箱参数",
+      destLabel: "3. 选择目的国 (选填, 预估到门运费)",
+      shippingTotal: "到门总价(DDP)",
+      shippingUnit: "到门单价(含运费)",
       empty: "请在上方选择材质和尺寸，即可查看完整的阶梯报价。",
       noData: "正在加载报价资料库...",
       ctaTitle: "获取精准底价",
@@ -58,6 +69,9 @@ export default function PricingPage() {
       unit: "預估單價",
       total: "預估總價",
       shipping: "預估裝箱參數",
+      destLabel: "3. 選擇目的國 (選填, 預估到門運費)",
+      shippingTotal: "到門總價(DDP)",
+      shippingUnit: "到門單價(含運費)",
       empty: "請在上方選擇材質和尺寸，即可查看完整的階梯報價。",
       noData: "正在加載報價資料庫...",
       ctaTitle: "獲取精準底價",
@@ -69,12 +83,30 @@ export default function PricingPage() {
   const t = text[lang as keyof typeof text] || text.en;
 
   useEffect(() => {
+    // 基础价格资料库
     fetch("/api/admin/pricing")
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setRules(data.data);
         }
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setIsLoading(false);
+      });
+
+    // 运费资料库
+    fetch("/api/admin/shipping")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setShippingRates(data.data);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
         setIsLoading(false);
       })
       .catch(err => {
@@ -116,6 +148,16 @@ export default function PricingPage() {
       .filter(r => r.material === selectedMaterial && r.size === selectedSize)
       .sort((a, b) => a.quantity - b.quantity);
   }, [rules, selectedMaterial, selectedSize]);
+
+  // 运费目的地选项
+  const countries = useMemo(() => Array.from(new Set(shippingRates.map(r => r.country))), [shippingRates]);
+  const availableMethods = useMemo(() => shippingRates.filter(r => r.country === selectedDestination), [shippingRates, selectedDestination]);
+
+  useEffect(() => {
+    if (availableMethods.length > 0 && (!selectedMethod || !availableMethods.find(m => m.method === selectedMethod))) {
+      setSelectedMethod(availableMethods[0].method);
+    }
+  }, [availableMethods, selectedMethod]);
 
   return (
     <div className="min-h-screen bg-[#FBFAF7] pt-32 pb-24 font-sans">
@@ -197,6 +239,47 @@ export default function PricingPage() {
                   </div>
                 </div>
 
+                {/* 目的国选择 */}
+                <div className="mt-10 pt-10 border-t border-[#101828]/5">
+                  <h3 className="text-[13px] font-bold text-[#101828] uppercase tracking-widest mb-4">
+                    {t.destLabel}
+                  </h3>
+                  <div className="relative">
+                    <select
+                      value={selectedDestination || ""}
+                      onChange={(e) => setSelectedDestination(e.target.value)}
+                      className="w-full appearance-none px-5 py-4 rounded-xl border border-[#101828]/10 bg-white focus:border-[#101828] focus:ring-1 focus:ring-[#101828] outline-none font-medium text-[#101828] cursor-pointer transition-all shadow-sm"
+                    >
+                      <option value="">--- 无 (仅显示出厂价 EXW) ---</option>
+                      {countries.map(country => (
+                        <option key={country as string} value={country as string}>{country as string}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#667085] pointer-events-none" />
+                  </div>
+                  
+                  {selectedDestination && availableMethods.length > 0 && (
+                    <div className="mt-4">
+                      <div className="flex gap-2 flex-wrap">
+                        {availableMethods.map((m) => (
+                          <button
+                            key={m.method}
+                            onClick={() => setSelectedMethod(m.method)}
+                            className={`px-4 py-2 rounded-lg text-[13px] font-bold transition-all ${
+                              selectedMethod === m.method 
+                                ? "bg-[#101828] text-white" 
+                                : "bg-white border border-[#101828]/10 text-[#667085] hover:border-[#101828]/30"
+                            }`}
+                          >
+                            {m.method}
+                            {m.estimatedDays && <span className="ml-1 opacity-70">({m.estimatedDays})</span>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
               </div>
 
               {/* Right Side: Results */}
@@ -207,33 +290,66 @@ export default function PricingPage() {
 
                 {currentTiers.length > 0 ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-4 text-[12px] font-bold text-[#667085] uppercase tracking-wider pb-2 border-b border-[#101828]/5">
+                    <div className={`grid ${selectedDestination ? 'grid-cols-5' : 'grid-cols-4'} text-[12px] font-bold text-[#667085] uppercase tracking-wider pb-2 border-b border-[#101828]/5`}>
                       <div>{t.qty}</div>
                       <div className="text-right">{t.unit}</div>
                       <div className="text-right">{t.total}</div>
                       <div className="text-right">{t.shipping}</div>
+                      {selectedDestination && <div className="text-right text-blue-600">{t.shippingTotal}</div>}
                     </div>
                     
                     <div className="flex flex-col gap-3 pt-2">
-                      {currentTiers.map((tier, idx) => (
-                        <div key={idx} className="grid grid-cols-4 items-center p-4 rounded-xl bg-[#F9F9F8] border border-[#101828]/5 hover:bg-[#F0F0EE] transition-colors">
-                          <div className="font-bold text-[#101828] text-[15px]">
-                            {tier.quantity.toLocaleString()}
+                      {currentTiers.map((tier, idx) => {
+                        let shippingCost = 0;
+                        const rate = availableMethods.find(m => m.method === selectedMethod);
+                        if (selectedDestination && rate && tier.unitWeight && tier.cbmPer1000) {
+                          const actualWeightKg = (tier.unitWeight * tier.quantity) / 1000;
+                          const totalCbm = (tier.cbmPer1000 * tier.quantity) / 1000;
+                          const volWeightKg = (totalCbm * 1000000) / rate.volumetricRatio;
+                          const chargeableWeight = Math.max(actualWeightKg, volWeightKg);
+
+                          if (rate.pricePerKg) {
+                            shippingCost = chargeableWeight * rate.pricePerKg;
+                          } else if (rate.pricePerCbm) {
+                            shippingCost = totalCbm * rate.pricePerCbm;
+                            if (shippingCost < rate.pricePerCbm) shippingCost = rate.pricePerCbm; // minimum 1 CBM usually
+                          }
+                        }
+
+                        const landedTotal = tier.totalPrice + shippingCost;
+                        const landedUnit = landedTotal / tier.quantity;
+
+                        return (
+                          <div key={idx} className={`grid ${selectedDestination ? 'grid-cols-5' : 'grid-cols-4'} items-center p-4 rounded-xl bg-[#F9F9F8] border border-[#101828]/5 hover:bg-[#F0F0EE] transition-colors`}>
+                            <div className="font-bold text-[#101828] text-[15px]">
+                              {tier.quantity.toLocaleString()}
+                            </div>
+                            <div className="text-right font-medium text-[#667085]">
+                              ${tier.unitPrice.toFixed(3)}
+                            </div>
+                            <div className="text-right font-bold text-[#101828] text-[17px]">
+                              ${tier.totalPrice.toFixed(2)}
+                            </div>
+                            <div className="text-right text-[12px] text-[#667085] leading-snug flex flex-col items-end justify-center">
+                              {tier.unitWeight && <div>{((tier.unitWeight * tier.quantity) / 1000).toFixed(1)} KG</div>}
+                              {tier.cbmPer1000 && <div>{((tier.cbmPer1000 * tier.quantity) / 1000).toFixed(2)} CBM</div>}
+                              {!tier.unitWeight && !tier.cbmPer1000 && <span className="opacity-40">-</span>}
+                            </div>
+                            {selectedDestination && (
+                              <div className="text-right flex flex-col items-end justify-center border-l border-[#101828]/5 pl-4">
+                                {shippingCost > 0 ? (
+                                  <>
+                                    <div className="font-black text-blue-700 text-[17px]">${landedTotal.toFixed(2)}</div>
+                                    <div className="text-[11px] text-blue-500 font-bold mt-0.5">{t.shippingUnit} ${landedUnit.toFixed(3)}</div>
+                                  </>
+                                ) : (
+                                  <div className="text-[12px] text-slate-400">参数不全</div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <div className="text-right font-medium text-[#667085]">
-                            ${tier.unitPrice.toFixed(3)}
-                          </div>
-                          <div className="text-right font-bold text-[#101828] text-[17px]">
-                            ${tier.totalPrice.toFixed(2)}
-                          </div>
-                          <div className="text-right text-[12px] text-[#667085] leading-snug flex flex-col items-end justify-center">
-                            {tier.unitWeight && <div>{((tier.unitWeight * tier.quantity) / 1000).toFixed(1)} KG</div>}
-                            {tier.cbmPer1000 && <div>{((tier.cbmPer1000 * tier.quantity) / 1000).toFixed(2)} CBM</div>}
-                            {tier.pcsPerCarton && <div>{Math.ceil(tier.quantity / tier.pcsPerCarton)} 箱 {tier.cartonSize && `(${tier.cartonSize})`}</div>}
-                            {!tier.unitWeight && !tier.cbmPer1000 && !tier.pcsPerCarton && <span className="opacity-40">-</span>}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
