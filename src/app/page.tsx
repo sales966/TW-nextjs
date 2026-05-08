@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { DawnBagsOpening } from "@/components/ui/dawn-bags-opening";
 import { AnimatePresence, motion } from "framer-motion";
 import { ScrollReveal, RevealText, RevealImage } from "@/components/ui/scroll-reveal";
+import { HomePricing } from "@/components/HomePricing";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -205,8 +206,27 @@ export default function Home() {
         </ScrollReveal>
       </section>
 
-      {/* 5. Craft */}
-      <section className="py-40 bg-[#FBFAF7] border-t border-[#101828]/5">
+      {/* 5. Pricing Matrix */}
+      <section className="py-40 bg-[#FBFAF7]">
+        <ScrollReveal className="max-w-[1200px] mx-auto px-6 lg:px-12">
+          <RevealText className="flex justify-between items-end mb-16">
+            <div>
+              <h2 className="text-[36px] md:text-[48px] font-bold text-[#101828] tracking-tight mb-4">
+                {lang === 'zh' ? '出厂报价矩阵' : lang === 'tw' ? '出廠報價矩陣' : 'Wholesale Matrix'}
+              </h2>
+              <p className="text-[18px] text-[#667085] font-normal leading-[1.7] max-w-2xl">
+                {lang === 'zh' ? '透明的阶梯出厂价，帮助您快速评估基础预算。' : lang === 'tw' ? '透明的階梯出廠價，幫助您快速評估基礎預算。' : 'Transparent tiered wholesale pricing. Calculate exact global shipping & taxes in our full estimator.'}
+              </p>
+            </div>
+          </RevealText>
+          <RevealText delay={0.2}>
+            <HomePricing />
+          </RevealText>
+        </ScrollReveal>
+      </section>
+
+      {/* 6. Craft */}
+      <section className="py-40 bg-[#EAE8E2] border-t border-[#101828]/5">
         <ScrollReveal className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <RevealText className="flex justify-between items-end mb-24 pb-8">
              <h2 className="text-[36px] md:text-[48px] font-bold text-[#101828] tracking-tight">{th.craftTitle}</h2>
