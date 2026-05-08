@@ -184,11 +184,18 @@ export default function PricingRulesPage() {
     }, {});
 
   const handleExportExcel = () => {
-    if (!viewProduct || Object.keys(groupedSizes).length === 0) {
-      return alert("当前商品没有数据可导出");
+    if (rules.length === 0) {
+      return alert("当前没有数据可导出");
     }
 
-    const exportData = activeRules.map((rule: any) => ({
+    // 对全部规则按商品名、尺寸、数量进行排序
+    const sortedRules = [...rules].sort((a, b) => {
+      if (a.material !== b.material) return a.material.localeCompare(b.material);
+      if (a.size !== b.size) return a.size.localeCompare(b.size);
+      return a.quantity - b.quantity;
+    });
+
+    const exportData = sortedRules.map((rule: any) => ({
       "商品名称": rule.material,
       "尺寸规格": rule.size,
       "订购数量(个)": rule.quantity,
@@ -198,13 +205,13 @@ export default function PricingRulesPage() {
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "报价表");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "全部报价总表");
     
-    // Auto-size columns roughly
-    const maxWidths = [20, 25, 15, 15, 15];
+    // 粗略调整列宽
+    const maxWidths = [25, 25, 15, 15, 15];
     worksheet['!cols'] = maxWidths.map(w => ({ wch: w }));
 
-    XLSX.writeFile(workbook, `${viewProduct}_报价表.xlsx`);
+    XLSX.writeFile(workbook, `已上架全部报价表.xlsx`);
   };
 
 
@@ -357,10 +364,18 @@ export default function PricingRulesPage() {
 
         {/* 沉浸式数据看板 */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
             <h2 className="text-lg font-bold text-slate-800 flex items-center">
               <Box className="w-5 h-5 mr-2 text-slate-500" /> 已上架报价总览
             </h2>
+            {rules.length > 0 && (
+              <button
+                onClick={handleExportExcel}
+                className="flex items-center px-4 py-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition border border-green-200 shadow-sm"
+              >
+                <Download className="w-4 h-4 mr-1.5" /> 导出全部商品 (Excel)
+              </button>
+            )}
           </div>
           
           {isLoading ? (
@@ -446,12 +461,6 @@ export default function PricingRulesPage() {
                       </div>
                     ) : (
                       <div className="flex gap-2">
-                        <button
-                          onClick={handleExportExcel}
-                          className="flex items-center px-4 py-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition"
-                        >
-                          <Download className="w-4 h-4 mr-1.5" /> 导出 Excel
-                        </button>
                         <button
                           onClick={handleDeleteProduct}
                           disabled={isSubmitting}
