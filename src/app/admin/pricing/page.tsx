@@ -93,6 +93,36 @@ export default function PricingRulesPage() {
     }
   };
 
+  const handleDeleteProduct = async () => {
+    if (!viewProduct) return;
+    if (!confirm(`确定要删除商品 "${viewProduct}" 的所有尺寸和阶梯价吗？此操作不可恢复！`)) return;
+    
+    setIsSubmitting(true);
+    try {
+      const productRules = rules.filter((r: any) => r.material === viewProduct);
+      await Promise.all(
+        productRules.map((rule: any) => 
+          fetch(`/api/admin/pricing/${rule.id}`, { method: "DELETE" })
+        )
+      );
+      
+      // Select another product or null
+      const remainingProducts = Array.from(new Set(rules.map((r: any) => r.material))).filter(p => p !== viewProduct);
+      if (remainingProducts.length > 0) {
+        setViewProduct(remainingProducts[0] as string);
+      } else {
+        setViewProduct(null);
+      }
+      
+      fetchRules();
+    } catch (error) {
+      alert("批量删除出错");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleEditProduct = () => {
     const productRules = rules.filter((r: any) => r.material === viewProduct);
     setEditedRules(JSON.parse(JSON.stringify(productRules)));
@@ -404,6 +434,14 @@ export default function PricingRulesPage() {
                           className="flex items-center px-4 py-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition"
                         >
                           <Download className="w-4 h-4 mr-1.5" /> 导出 Excel
+                        </button>
+                        <button
+                          onClick={handleDeleteProduct}
+                          disabled={isSubmitting}
+                          className="flex items-center px-4 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition disabled:opacity-50"
+                        >
+                          {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Trash2 className="w-4 h-4 mr-1.5" />}
+                          删除此商品
                         </button>
                         <button
                           onClick={handleEditProduct}
