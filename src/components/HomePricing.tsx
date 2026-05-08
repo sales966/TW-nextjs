@@ -14,6 +14,19 @@ const getMaterialImage = (materialName: string) => {
   return '/images/pricing/bag_plain.png';
 };
 
+const getSizeImage = (materialName: string, sizeName: string) => {
+  let materialKey = 'plain';
+  if (materialName.includes('牛皮')) materialKey = 'kraft';
+  if (materialName.includes('铜版纸')) materialKey = 'coated';
+  if (materialName.includes('黑卡')) materialKey = 'black';
+
+  let sizeKey = 'small'; // 对应单杯装等细长尺寸
+  if (sizeName.toLowerCase().includes('21cm')) sizeKey = 'medium'; // 对应中号方正尺寸
+  if (sizeName.toLowerCase().includes('28cm')) sizeKey = 'large'; // 对应大号宽版尺寸
+
+  return `/images/pricing/${materialKey}_${sizeKey}.png`;
+};
+
 export function HomePricing() {
   const { lang } = useI18n();
   const [rules, setRules] = useState<any[]>([]);
@@ -108,9 +121,11 @@ export function HomePricing() {
                 {product.sizesList.map((sz: any, i: number) => (
                   <div key={i} className="flex flex-col">
                     
-                    {/* 极简尺寸节点 */}
-                    <div className="flex items-center text-[10px] font-bold text-[#101828]/50 uppercase tracking-widest mb-1.5 pl-1">
-                      <div className="w-1.5 h-1.5 bg-[#101828]/20 rounded-full mr-2"></div>
+                    {/* 带尺寸比例图的节点 */}
+                    <div className="flex items-center text-[10px] md:text-[11px] font-bold text-[#101828]/70 uppercase tracking-widest mb-1.5 pl-0.5 mt-1.5">
+                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-md border border-[#101828]/10 mr-2.5 relative overflow-hidden bg-white shadow-sm flex-shrink-0">
+                        <Image src={getSizeImage(product.material, sz.name)} fill className="object-cover" alt={sz.name} unoptimized />
+                      </div>
                       {sz.name}
                     </div>
                     
