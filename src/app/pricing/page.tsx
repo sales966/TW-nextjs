@@ -4,6 +4,16 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Calculator, ArrowRight, Loader2, Info, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
+import Image from "next/image";
+
+const getMaterialImage = (materialName: string | null) => {
+  if (!materialName) return '/images/pricing/bag_plain.png';
+  if (materialName.includes('普通纸')) return '/images/pricing/bag_plain.png';
+  if (materialName.includes('牛皮')) return '/images/pricing/bag_kraft.png';
+  if (materialName.includes('铜版纸')) return '/images/pricing/bag_coated.png';
+  if (materialName.includes('黑卡')) return '/images/pricing/bag_black.png';
+  return '/images/pricing/bag_plain.png';
+};
 
 export default function PricingPage() {
   const { lang } = useI18n();
@@ -233,6 +243,18 @@ export default function PricingPage() {
               {/* Left Side: Selectors */}
               <div className="lg:col-span-5 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-[#101828]/5 bg-[#FAFAFA]">
                 
+                {/* 动态商品预览图 */}
+                <div className="mb-10 relative w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden shadow-sm border border-[#101828]/5 bg-white group">
+                  <Image 
+                    src={getMaterialImage(selectedMaterial)} 
+                    alt={selectedMaterial || "Product Showcase"}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl pointer-events-none"></div>
+                </div>
+
                 <div className="mb-10">
                   <h3 className="text-[13px] font-bold text-[#101828] uppercase tracking-widest mb-4">
                     {t.matLabel}
