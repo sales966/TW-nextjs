@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2, Search, Edit2, Save } from "lucide-react";
+import { Plus, Trash2, Calculator, Loader2, Layers, Box, CheckCircle2, Search, Edit2, Save, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 
 export default function PricingRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -148,6 +149,31 @@ export default function PricingRulesPage() {
       acc[rule.size].sort((a: any, b: any) => a.quantity - b.quantity);
       return acc;
     }, {});
+
+  const handleExportExcel = () => {
+    if (!viewProduct || Object.keys(groupedSizes).length === 0) {
+      return alert("当前商品没有数据可导出");
+    }
+
+    const exportData = activeRules.map((rule: any) => ({
+      "商品名称": rule.material,
+      "尺寸规格": rule.size,
+      "订购数量(个)": rule.quantity,
+      "预估单价($)": Number(rule.unitPrice).toFixed(3),
+      "预估总价($)": Number(rule.totalPrice).toFixed(2),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "报价表");
+    
+    // Auto-size columns roughly
+    const maxWidths = [20, 25, 15, 15, 15];
+    worksheet['!cols'] = maxWidths.map(w => ({ wch: w }));
+
+    XLSX.writeFile(workbook, `${viewProduct}_报价表.xlsx`);
+  };
+
 
   return (
     <div className="min-h-screen bg-[#fafafa] p-8 lg:p-12 font-sans">
@@ -372,12 +398,20 @@ export default function PricingRulesPage() {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        onClick={handleEditProduct}
-                        className="flex items-center px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
-                      >
-                        <Edit2 className="w-4 h-4 mr-1.5" /> 编辑此商品
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleExportExcel}
+                          className="flex items-center px-4 py-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition"
+                        >
+                          <Download className="w-4 h-4 mr-1.5" /> 导出 Excel
+                        </button>
+                        <button
+                          onClick={handleEditProduct}
+                          className="flex items-center px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                        >
+                          <Edit2 className="w-4 h-4 mr-1.5" /> 编辑此商品
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
