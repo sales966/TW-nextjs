@@ -14,7 +14,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialVisit, setIsInitialVisit] = useState(true);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const th = t.home;
 
   useEffect(() => {
