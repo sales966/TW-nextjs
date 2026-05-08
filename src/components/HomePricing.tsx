@@ -90,49 +90,44 @@ export function HomePricing() {
       {/* 2x2 Grid 精致排版 */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 md:gap-6">
         {products.map((product: any, idx: number) => (
-          <div key={idx} className="bg-white rounded-[24px] border border-[#101828]/5 shadow-[0_4px_20px_rgba(16,24,40,0.02)] p-5 md:p-6 flex flex-col sm:flex-row gap-5 md:gap-6 hover:shadow-[0_12px_40px_rgba(16,24,40,0.06)] hover:-translate-y-1 transition-all duration-500">
+          <div key={idx} className="bg-white rounded-[24px] border border-[#101828]/5 shadow-[0_4px_20px_rgba(16,24,40,0.02)] p-6 md:p-8 flex flex-col hover:shadow-[0_12px_40px_rgba(16,24,40,0.06)] hover:-translate-y-1 transition-all duration-500">
             
-            {/* 左侧：方形商品图 */}
-            <div className="w-full sm:w-1/3 max-w-[180px] flex-shrink-0">
-              <div className="relative aspect-square w-full rounded-[16px] overflow-hidden bg-[#FAFAFA] border border-[#101828]/5 group">
-                <Image 
-                  src={getMaterialImage(product.material)} 
-                  alt={product.material}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  unoptimized
-                />
-                <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[16px] pointer-events-none"></div>
-              </div>
+            {/* 左上角：商品名称 */}
+            <div className="mb-6 pb-4 border-b border-[#101828]/5 flex justify-between items-center">
+              <h3 className="text-[20px] md:text-[22px] font-black text-[#101828] tracking-tight leading-none">
+                {product.material}
+              </h3>
             </div>
             
-            {/* 右侧：高密度精致数据列表 */}
-            <div className="flex-1 flex flex-col justify-start pt-1">
-              
-              {/* 产品名称 */}
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#101828]/5">
-                <h3 className="text-[17px] md:text-[19px] font-black text-[#101828] tracking-tight leading-none">
-                  {product.material}
-                </h3>
-              </div>
-              
-              {/* 尺寸及阶梯价区块 */}
-              <div className="space-y-4 flex-grow">
-                {product.sizesList.map((sz: any, i: number) => (
-                  <div key={i} className="flex flex-col">
+            {/* 尺寸列表（每行左侧是尺寸配图，右侧是阶梯价） */}
+            <div className="space-y-6 flex-grow">
+              {product.sizesList.map((sz: any, i: number) => (
+                <div key={i} className="flex flex-row gap-5 md:gap-6 items-start">
+                  
+                  {/* 左侧：专属尺寸比例图 */}
+                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 relative rounded-[14px] border border-[#101828]/5 overflow-hidden bg-[#FAFAFA] group mt-1">
+                    <Image 
+                      src={getSizeImage(product.material, sz.name)} 
+                      fill 
+                      className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                      alt={sz.name} 
+                      unoptimized 
+                    />
+                    <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[14px] pointer-events-none"></div>
+                  </div>
+                  
+                  {/* 右侧：尺寸标题与阶梯价表 */}
+                  <div className="flex-1 flex flex-col justify-start">
                     
-                    {/* 带尺寸比例图的节点 */}
-                    <div className="flex items-center text-[10px] md:text-[11px] font-bold text-[#101828]/70 uppercase tracking-widest mb-1.5 pl-0.5 mt-1.5">
-                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-md border border-[#101828]/10 mr-2.5 relative overflow-hidden bg-white shadow-sm flex-shrink-0">
-                        <Image src={getSizeImage(product.material, sz.name)} fill className="object-cover" alt={sz.name} unoptimized />
-                      </div>
+                    {/* 尺寸名称 */}
+                    <div className="flex items-center text-[10px] md:text-[11px] font-bold text-[#101828]/60 uppercase tracking-widest mb-2 pl-0.5">
                       {sz.name}
                     </div>
                     
-                    {/* 阶梯价斑马纹数据行 */}
-                    <div className="flex flex-col gap-0.5">
+                    {/* 阶梯价细目 */}
+                    <div className="flex flex-col gap-1">
                       {sz.tiers.map((tier: any, j: number) => (
-                        <div key={j} className="flex justify-between items-center text-[12px] bg-[#FAFAFA]/50 px-2.5 py-1.5 rounded-lg hover:bg-[#F4F8FD] transition-colors group cursor-default">
+                        <div key={j} className="flex justify-between items-center text-[13px] bg-[#FAFAFA]/70 px-3 py-1.5 rounded-lg hover:bg-[#F4F8FD] transition-colors group cursor-default">
                           <span className="font-semibold text-[#667085] group-hover:text-blue-700 transition-colors">
                             {tier.quantity.toLocaleString()} <span className="text-[10px] font-normal opacity-60 ml-0.5">pcs</span>
                           </span>
@@ -144,8 +139,8 @@ export function HomePricing() {
                     </div>
                     
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
             
           </div>
