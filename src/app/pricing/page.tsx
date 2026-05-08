@@ -337,26 +337,32 @@ export default function PricingPage() {
                             
                             {/* 第二排：DDP 到门价（如果选择了目的国） */}
                             {selectedDestination && (
-                              <div className="bg-[#F4F8FD] border-t border-blue-100 p-4 px-5 flex flex-wrap items-center justify-between gap-4">
-                                <div className="flex items-center text-blue-600/80 text-[13px] font-medium">
+                              <div className="bg-gradient-to-r from-[#F4F8FD] to-[#F9FCFF] border-t border-blue-100 p-4 px-5 flex flex-wrap items-center justify-between gap-4">
+                                <div className="flex items-center">
                                   {hasShippingParams ? (
-                                    <>
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>
-                                      <span>+ Shipping Cost: ${shippingCost.toFixed(2)}</span>
-                                    </>
+                                    <div className="flex items-center flex-wrap gap-2">
+                                      <div className="flex items-center text-blue-700 text-[13.5px] font-bold">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>
+                                        <span>+ Shipping & Import Taxes: ${shippingCost.toFixed(2)}</span>
+                                      </div>
+                                      <div className="px-2 py-0.5 bg-green-100 border border-green-200 text-green-700 text-[10.5px] uppercase font-black tracking-wider rounded-md flex items-center shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
+                                        Duty Included (DDP)
+                                      </div>
+                                    </div>
                                   ) : (
-                                    <span className="text-slate-400 italic">缺失重量/材积参数，无法预估运费</span>
+                                    <span className="text-slate-400 italic text-[13px]">缺失重量/材积参数，无法预估运费及税费</span>
                                   )}
                                 </div>
                                 {hasShippingParams && (
-                                  <div className="flex items-center gap-6">
+                                  <div className="flex items-center gap-6 mt-2 sm:mt-0">
                                     <div className="text-right">
                                       <span className="text-[11px] text-blue-500/80 uppercase tracking-wider font-bold mr-2">{t.shippingUnit}</span>
                                       <span className="font-bold text-blue-700">${landedUnit.toFixed(3)}</span>
                                     </div>
                                     <div className="text-right">
                                       <span className="text-[11px] text-blue-500/80 uppercase tracking-wider font-bold mr-2">{t.shippingTotal}</span>
-                                      <span className="text-[18px] font-black text-blue-700">${landedTotal.toFixed(2)}</span>
+                                      <span className="text-[18px] font-black text-blue-700 bg-white px-2.5 py-0.5 rounded-md border border-blue-100 shadow-sm">${landedTotal.toFixed(2)}</span>
                                     </div>
                                   </div>
                                 )}
