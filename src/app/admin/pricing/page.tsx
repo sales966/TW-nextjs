@@ -158,8 +158,9 @@ export default function PricingRulesPage() {
     }
   };
 
-  // 提取唯一的商品名 (用于看板左侧)
+  // 提取唯一的商品名与尺寸 (用于看板左侧及输入补全)
   const uniqueProducts = Array.from(new Set(rules.map((r: any) => r.material)));
+  const uniqueSizes = Array.from(new Set(rules.map((r: any) => r.size)));
   const filteredProducts = uniqueProducts.filter((p: any) => p.toLowerCase().includes(searchTerm.toLowerCase()));
 
   // 默认选中第一个商品
@@ -241,10 +242,16 @@ export default function PricingRulesPage() {
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-medium text-slate-900 transition-all"
                 />
                 <datalist id="material-options">
-                  <option value="牛皮单色250克" />
-                  <option value="铜版纸4色250克" />
-                  <option value="黑卡单色250克" />
-                  <option value="普通纸单印120克" />
+                  {uniqueProducts.length > 0 ? (
+                    uniqueProducts.map((p) => <option key={p as string} value={p as string} />)
+                  ) : (
+                    <>
+                      <option value="牛皮单色250克" />
+                      <option value="铜版纸4色250克" />
+                      <option value="黑卡单色250克" />
+                      <option value="普通纸单印120克" />
+                    </>
+                  )}
                 </datalist>
               </div>
 
@@ -259,9 +266,15 @@ export default function PricingRulesPage() {
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-medium text-slate-900 transition-all"
                 />
                 <datalist id="size-options">
-                  <option value="12.8cm*9.5cm*22cm" />
-                  <option value="21cm*14cm*19cm" />
-                  <option value="28cm*15cm*28cm" />
+                  {uniqueSizes.length > 0 ? (
+                    uniqueSizes.map((s) => <option key={s as string} value={s as string} />)
+                  ) : (
+                    <>
+                      <option value="12.8cm*9.5cm*22cm" />
+                      <option value="21cm*14cm*19cm" />
+                      <option value="28cm*15cm*28cm" />
+                    </>
+                  )}
                 </datalist>
               </div>
             </div>
