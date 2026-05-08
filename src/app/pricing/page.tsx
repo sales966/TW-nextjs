@@ -283,19 +283,22 @@ export default function PricingPage() {
 
                 {currentTiers.length > 0 ? (
                   <div className="space-y-4">
-                    <div className={`grid ${selectedDestination ? 'grid-cols-5' : 'grid-cols-4'} text-[12px] font-bold text-[#667085] uppercase tracking-wider pb-2 border-b border-[#101828]/5`}>
+                    {/* 表头始终保持 4 列（只展示出厂价和装箱信息） */}
+                    <div className="grid grid-cols-[1fr_1.2fr_1.2fr_1fr] text-[12px] font-bold text-[#667085] uppercase tracking-wider pb-2 border-b border-[#101828]/5 px-4">
                       <div>{t.qty}</div>
                       <div className="text-right">{t.unit}</div>
                       <div className="text-right">{t.total}</div>
                       <div className="text-right">{t.shipping}</div>
-                      {selectedDestination && <div className="text-right text-blue-600">{t.shippingTotal}</div>}
                     </div>
                     
-                    <div className="flex flex-col gap-3 pt-2">
+                    <div className="flex flex-col gap-4 pt-2">
                       {currentTiers.map((tier, idx) => {
                         let shippingCost = 0;
                         const rate = availableMethods.find(m => m.method === selectedMethod);
+                        let hasShippingParams = false;
+
                         if (selectedDestination && rate && tier.unitWeight && tier.cbmPer1000) {
+                          hasShippingParams = true;
                           const actualWeightKg = (tier.unitWeight * tier.quantity) / 1000;
                           const totalCbm = (tier.cbmPer1000 * tier.quantity) / 1000;
                           const volWeightKg = (totalCbm * 1000000) / rate.volumetricRatio;
@@ -313,30 +316,49 @@ export default function PricingPage() {
                         const landedUnit = landedTotal / tier.quantity;
 
                         return (
-                          <div key={idx} className={`grid ${selectedDestination ? 'grid-cols-5' : 'grid-cols-4'} items-center p-4 rounded-xl bg-[#F9F9F8] border border-[#101828]/5 hover:bg-[#F0F0EE] transition-colors`}>
-                            <div className="font-bold text-[#101828] text-[15px]">
-                              {tier.quantity.toLocaleString()}
+                          <div key={idx} className="flex flex-col bg-white rounded-2xl border border-[#101828]/5 hover:border-[#101828]/10 hover:shadow-md transition-all overflow-hidden">
+                            {/* 第一排：基础出厂价（EXW） */}
+                            <div className="grid grid-cols-[1fr_1.2fr_1.2fr_1fr] items-center p-5 bg-[#F9F9F8]">
+                              <div className="font-bold text-[#101828] text-[16px]">
+                                {tier.quantity.toLocaleString()}
+                              </div>
+                              <div className="text-right font-medium text-[#667085]">
+                                ${tier.unitPrice.toFixed(3)}
+                              </div>
+                              <div className="text-right font-black text-[#101828] text-[18px]">
+                                ${tier.totalPrice.toFixed(2)}
+                              </div>
+                              <div className="text-right text-[12px] text-[#667085] leading-relaxed flex flex-col items-end justify-center">
+                                {tier.unitWeight && <div>{((tier.unitWeight * tier.quantity) / 1000).toFixed(1)} KG</div>}
+                                {tier.cbmPer1000 && <div>{((tier.cbmPer1000 * tier.quantity) / 1000).toFixed(2)} CBM</div>}
+                                {!tier.unitWeight && !tier.cbmPer1000 && <span className="opacity-40">-</span>}
+                              </div>
                             </div>
-                            <div className="text-right font-medium text-[#667085]">
-                              ${tier.unitPrice.toFixed(3)}
-                            </div>
-                            <div className="text-right font-bold text-[#101828] text-[17px]">
-                              ${tier.totalPrice.toFixed(2)}
-                            </div>
-                            <div className="text-right text-[12px] text-[#667085] leading-snug flex flex-col items-end justify-center">
-                              {tier.unitWeight && <div>{((tier.unitWeight * tier.quantity) / 1000).toFixed(1)} KG</div>}
-                              {tier.cbmPer1000 && <div>{((tier.cbmPer1000 * tier.quantity) / 1000).toFixed(2)} CBM</div>}
-                              {!tier.unitWeight && !tier.cbmPer1000 && <span className="opacity-40">-</span>}
-                            </div>
+                            
+                            {/* 第二排：DDP 到门价（如果选择了目的国） */}
                             {selectedDestination && (
-                              <div className="text-right flex flex-col items-end justify-center border-l border-[#101828]/5 pl-4">
-                                {shippingCost > 0 ? (
-                                  <>
-                                    <div className="font-black text-blue-700 text-[17px]">${landedTotal.toFixed(2)}</div>
-                                    <div className="text-[11px] text-blue-500 font-bold mt-0.5">{t.shippingUnit} ${landedUnit.toFixed(3)}</div>
-                                  </>
-                                ) : (
-                                  <div className="text-[12px] text-slate-400">参数不全</div>
+                              <div className="bg-[#F4F8FD] border-t border-blue-100 p-4 px-5 flex flex-wrap items-center justify-between gap-4">
+                                <div className="flex items-center text-blue-600/80 text-[13px] font-medium">
+                                  {hasShippingParams ? (
+                                    <>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>
+                                      <span>+ Shipping Cost: ${shippingCost.toFixed(2)}</span>
+                                    </>
+                                  ) : (
+                                    <span className="text-slate-400 italic">缺失重量/材积参数，无法预估运费</span>
+                                  )}
+                                </div>
+                                {hasShippingParams && (
+                                  <div className="flex items-center gap-6">
+                                    <div className="text-right">
+                                      <span className="text-[11px] text-blue-500/80 uppercase tracking-wider font-bold mr-2">{t.shippingUnit}</span>
+                                      <span className="font-bold text-blue-700">${landedUnit.toFixed(3)}</span>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="text-[11px] text-blue-500/80 uppercase tracking-wider font-bold mr-2">{t.shippingTotal}</span>
+                                      <span className="text-[18px] font-black text-blue-700">${landedTotal.toFixed(2)}</span>
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             )}
