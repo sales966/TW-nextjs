@@ -19,6 +19,10 @@ export default function PricingPage() {
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
 
+  // 汇率与多货币
+  const [exchangeRates, setExchangeRates] = useState<any>({ USD: 1 });
+  const [currency, setCurrency] = useState<string>("USD");
+
   // 文本多语言
   const text = {
     en: {
@@ -106,6 +110,16 @@ export default function PricingPage() {
         }
       })
       .catch(err => console.error(err));
+
+    // 汇率资料库
+    fetch("/api/exchange-rates")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.rates) {
+          setExchangeRates(data.rates);
+        }
+      })
+      .catch(err => console.error(err));
   }, []);
 
   // 提取唯一的材质
@@ -151,6 +165,46 @@ export default function PricingPage() {
       setSelectedMethod(availableMethods[0].method);
     }
   }, [availableMethods, selectedMethod]);
+
+  // 目的国与货币的自动联动
+  useEffect(() => {
+    if (!selectedDestination) {
+      setCurrency("USD");
+      return;
+    }
+    const dest = selectedDestination.toLowerCase();
+    if (dest.includes("uk")) setCurrency("GBP");
+    else if (dest.includes("europe") || dest.includes("eu")) setCurrency("EUR");
+    else if (dest.includes("australia")) setCurrency("AUD");
+    else if (dest.includes("canada")) setCurrency("CAD");
+    else if (dest.includes("new zealand")) setCurrency("NZD");
+    else if (dest.includes("japan")) setCurrency("JPY");
+    else if (dest.includes("singapore")) setCurrency("SGD");
+    else if (dest.includes("korea")) setCurrency("KRW");
+    else if (dest.includes("mexico")) setCurrency("MXN");
+    else if (dest.includes("uae") || dest.includes("middle east")) setCurrency("AED");
+    else setCurrency("USD");
+  }, [selectedDestination]);
+
+  // 货币格式化工具
+  const formatPrice = (amountInUSD: number, isUnit = false) => {
+    const rate = exchangeRates[currency] || 1;
+    const converted = amountInUSD * rate;
+    const decimals = (currency === 'JPY' || currency === 'KRW') ? 0 : (isUnit ? 3 : 2);
+    
+    return new Intl.NumberFormat(lang === 'zh' ? 'zh-CN' : 'en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(converted);
+  };
+
+  const availableCurrencies = Object.keys(exchangeRates).sort((a, b) => {
+    if (a === 'USD') return -1;
+    if (b === 'USD') return 1;
+    return a.localeCompare(b);
+  });
 
   return (
     <div className="min-h-screen bg-[#FBFAF7] pt-32 pb-24 font-sans">
@@ -276,10 +330,29 @@ export default function PricingPage() {
               </div>
 
               {/* Right Side: Results */}
-              <div className="lg:col-span-7 p-8 lg:p-12">
-                <h3 className="text-xl font-bold text-[#101828] tracking-tight mb-8">
-                  {t.resultTitle}
-                </h3>
+              <div className="lg:col-span-7 p-8 lg:p-12 relative">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                  <h3 className="text-xl font-bold text-[#101828] tracking-tight">
+                    {t.resultTitle}
+                  </h3>
+                  
+                  {/* Currency Selector */}
+                  <div className="flex items-center bg-white border border-[#101828]/10 rounded-lg px-3 py-1.5 shadow-sm">
+                    <span className="text-[12px] font-bold text-[#667085] mr-2 uppercase tracking-wide">Currency</span>
+                    <div className="relative">
+                      <select 
+                        value={currency} 
+                        onChange={(e) => setCurrency(e.target.value)}
+                        className="appearance-none bg-transparent pr-5 text-[13px] font-black text-[#101828] focus:outline-none cursor-pointer"
+                      >
+                        {availableCurrencies.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#101828] pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
 
                 {currentTiers.length > 0 ? (
                   <div className="space-y-4">
@@ -323,10 +396,10 @@ export default function PricingPage() {
                                 {tier.quantity.toLocaleString()}
                               </div>
                               <div className="text-right font-medium text-[#667085]">
-                                ${tier.unitPrice.toFixed(3)}
+                                {formatPrice(tier.unitPrice, true)}
                               </div>
                               <div className="text-right font-black text-[#101828] text-[18px]">
-                                ${tier.totalPrice.toFixed(2)}
+                                {formatPrice(tier.totalPrice, false)}
                               </div>
                               <div className="text-right text-[12px] text-[#667085] leading-relaxed flex flex-col items-end justify-center">
                                 {tier.unitWeight && <div>{((tier.unitWeight * tier.quantity) / 1000).toFixed(1)} KG</div>}
@@ -343,7 +416,7 @@ export default function PricingPage() {
                                     <div className="flex items-center flex-wrap gap-2">
                                       <div className="flex items-center text-blue-700 text-[13.5px] font-bold">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>
-                                        <span>+ Shipping & Import Taxes: ${shippingCost.toFixed(2)}</span>
+                                        <span>+ Shipping & Import Taxes: {formatPrice(shippingCost, false)}</span>
                                       </div>
                                       <div className="px-2 py-0.5 bg-green-100 border border-green-200 text-green-700 text-[10.5px] uppercase font-black tracking-wider rounded-md flex items-center shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
@@ -358,11 +431,11 @@ export default function PricingPage() {
                                   <div className="flex items-center gap-6 mt-2 sm:mt-0">
                                     <div className="text-right">
                                       <span className="text-[11px] text-blue-500/80 uppercase tracking-wider font-bold mr-2">{t.shippingUnit}</span>
-                                      <span className="font-bold text-blue-700">${landedUnit.toFixed(3)}</span>
+                                      <span className="font-bold text-blue-700">{formatPrice(landedUnit, true)}</span>
                                     </div>
                                     <div className="text-right">
                                       <span className="text-[11px] text-blue-500/80 uppercase tracking-wider font-bold mr-2">{t.shippingTotal}</span>
-                                      <span className="text-[18px] font-black text-blue-700 bg-white px-2.5 py-0.5 rounded-md border border-blue-100 shadow-sm">${landedTotal.toFixed(2)}</span>
+                                      <span className="text-[18px] font-black text-blue-700 bg-white px-2.5 py-0.5 rounded-md border border-blue-100 shadow-sm">{formatPrice(landedTotal, false)}</span>
                                     </div>
                                   </div>
                                 )}
@@ -372,6 +445,11 @@ export default function PricingPage() {
                         );
                       })}
                     </div>
+                    {currency !== 'USD' && (
+                      <div className="text-right mt-3 text-[#98A2B3] text-[11px] italic pr-2">
+                        * Approximate costs in {currency} based on current exchange rates. Final billing may be in USD.
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="h-full min-h-[200px] flex items-center justify-center">
