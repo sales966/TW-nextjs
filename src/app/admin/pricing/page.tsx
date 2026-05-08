@@ -10,8 +10,8 @@ export default function PricingRulesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    material: "牛皮单色250克",
-    size: "12.8cm*9.5cm*22cm",
+    material: "",
+    size: "",
   });
 
   // 后台看板查看状态
@@ -240,6 +240,7 @@ export default function PricingRulesPage() {
                   list="material-options"
                   required
                   value={formData.material}
+                  placeholder="请选择或输入商品名..."
                   onChange={(e) => setFormData({ ...formData, material: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-medium text-slate-900 transition-all"
                 />
@@ -264,6 +265,7 @@ export default function PricingRulesPage() {
                   list="size-options"
                   required
                   value={formData.size}
+                  placeholder="请选择或输入尺寸 (长x宽x高)..."
                   onChange={(e) => setFormData({ ...formData, size: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#101828] outline-none font-medium text-slate-900 transition-all"
                 />
